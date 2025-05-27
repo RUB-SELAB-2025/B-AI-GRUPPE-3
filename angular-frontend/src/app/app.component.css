@@ -1,6 +1,6 @@
 .menu-bar {
   padding: 1rem;
-  background: #eee;
+  background: var(--mat-sys-surface);
   display: flex;
   gap: 1rem;
 }
