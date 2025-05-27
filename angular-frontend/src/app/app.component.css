@@ -1,0 +1,11 @@
+.menu-bar {
+  padding: 1rem;
+  background: #eee;
+  display: flex;
+  gap: 1rem;
+}
+@media (prefers-color-scheme: dark) {
+  .menu-bar {
+    background: black;
+  }
+}
