@@ -13,6 +13,7 @@ html {
     typography: Roboto,
     density: 0,
   ));
+  /* Added to enable dark mode */
   @media (prefers-color-scheme: dark) {
     @include mat.theme((
       color: (
