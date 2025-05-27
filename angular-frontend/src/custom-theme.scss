@@ -20,7 +20,9 @@ html {
         theme-type: dark,
         primary: mat.$azure-palette,
         tertiary: mat.$blue-palette,
-      )
+      ),
+      typography: Roboto,
+      density: 0,
     ))
   };
 }
