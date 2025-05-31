@@ -1,17 +1,23 @@
 <h1 mat-dialog-title>Select Data Source</h1>
 
 <mat-dialog-content>
-    <ul>
+    <ul style="list-style-type: none;">
         @for (source of sources(); track source.id) {
-        <li (click)="select(source)">
-            <strong>{{ source.name }}</strong>
-            @if (source.description; as description) {
-            <p>{{ description }}</p>
-            }
-            @if (selected()?.id === source.id) {
-            <span>[selected]</span>
-            }
-        </li>
+            <li> 
+                <!-- Material Cards for every list element, if not selected, the card is only outlined -->
+                <mat-card [appearance]="selected()?.id === source.id ? 'raised' : 'outlined'"> 
+                    <mat-card-header>
+                        <mat-card-title>{{ source.name }}</mat-card-title>
+                        @if (source.description; as description) {
+                            <mat-card-content>{{ description }}</mat-card-content>
+                        }
+                    </mat-card-header>
+                    <mat-card-actions>
+                        <button mat-button (click)="select(source)">Select</button>
+                    </mat-card-actions>
+                </mat-card>
+            </li>
+            <br />
         }
     </ul>
 
