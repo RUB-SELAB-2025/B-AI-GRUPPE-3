@@ -38,7 +38,8 @@ export class GraphComponent {
   constructor() {
     if(this.isInBrowser){
       queueMicrotask(() => {
-        const rect = this.svgGraph().nativeElement.getBoundingClientRect(); if (rect.width > 0 && rect.height > 0) {
+        const rect = this.svgGraph().nativeElement.getBoundingClientRect(); 
+        if (rect.width > 0 && rect.height > 0) {
           this.dataservice.updateGraphDimensions({ width: rect.width, height: rect.height });
         }
       });
