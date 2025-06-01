@@ -17,13 +17,7 @@ export class DataSourceService {
   private readonly $yDomain = signal([0, 100]);
   private readonly dataSourceSelectionService = inject(DataSourceSelectionService);
 
-  private readonly dummySeries = computed(() => {
-    const selectedSource = this.dataSourceSelectionService.currentSource();
-    if (!selectedSource) return {};
-
-    return selectedSource.data();
-  });
-
+  private readonly dummySeries = this.dataSourceSelectionService.data;
 
   readonly margin = { top: 20, right: 30, bottom: 40, left: 60 };
   graphDimensions = this.$graphDimensions.asReadonly();
@@ -129,7 +123,7 @@ export class DataSourceService {
           value,
         }));
 
-        const pathData = lineGen(parsedValues) ?? ''; 
+        const pathData = lineGen(parsedValues) ?? '';
         return {
           id: key,
           d: pathData,
@@ -154,7 +148,7 @@ export class DataSourceService {
           value,
         }));
 
-        const pathData = lineGen(parsedValues) ?? ''; 
+        const pathData = lineGen(parsedValues) ?? '';
         return {
           id: key,
           d: pathData,

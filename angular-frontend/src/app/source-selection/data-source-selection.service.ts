@@ -26,7 +26,7 @@ export interface DataSourceInfo  extends DataSource{
 })
 export class DataSourceSelectionService {
     private readonly liveDataService = inject(OmnAIScopeDataService);
-    private readonly _currentSource = signal<DataSourceInfo | null>(null); 
+    private readonly _currentSource = signal<DataSourceInfo[]>([]);
     private readonly dummyDataService = inject(DummyDataService);
 
     private readonly _availableSources = signal<DataSourceInfo[]>([
@@ -58,29 +58,45 @@ export class DataSourceSelectionService {
     readonly currentSource = this._currentSource.asReadonly();
 
     // whether a source is selected
-    readonly hasSelection = computed(() => this._currentSource() !== null);
+    readonly hasSelection = computed(() => this._currentSource().length !== 0);
 
     // selected source ID (null if none selected)
-    readonly selectedSourceId = computed(() => this._currentSource()?.id ?? null);
+    readonly selectedSourceId = computed(() => this._currentSource().map(v=> v.id ?? null));
 
+    isSelected(targetId: string): boolean {
+      for (const id of this.selectedSourceId()) {
+        if (id === targetId) return true;
+      }
+      return false;
+    }
     selectSource(source: DataSourceInfo): void {
-        this._currentSource.set(source);
+        this._currentSource.update(currentSource => {
+          return [...currentSource, source];
+        });
         console.log("Select Source");
         for (const [key, value] of Object.entries(this._currentSource)) {
             console.log(key.toString() + " # " + value.toString());
-        } 
+        }
     }
 
     clearSelection(): void {
-        this._currentSource.set(null);
+        this._currentSource.set([]);
     }
 
     addSourceToAvailbleSoruces(source: DataSourceInfo) {
         this._availableSources.update((value) => [...value, source])
     }
     readonly data = computed(() => {
-        const source = this._currentSource();
-        if (!source) return signal<Record<string, DataFormat[]>>({});
-        return source.data;
+        const sources = this._currentSource();
+        let data:Record<string, DataFormat[]> = {};
+
+        for (const source of sources) {
+          let sourceData = source.data();
+          for (const key of Object.keys(sourceData)) {
+            data[source.id + " - " + key] = sourceData[key];
+          }
+        }
+
+        return data;
     });
 }

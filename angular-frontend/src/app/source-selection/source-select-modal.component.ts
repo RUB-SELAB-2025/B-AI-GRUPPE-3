@@ -22,10 +22,13 @@ export class SourceSelectModalComponent {
     select(source: DataSourceInfo) {
         this.datasourceService.selectSource(source);
     }
+    isSelected(targetId: string): boolean {
+      return this.datasourceService.isSelected(targetId);
+    }
 
     clear() {
         this.datasourceService.clearSelection();
     }
 
-    
+
 }

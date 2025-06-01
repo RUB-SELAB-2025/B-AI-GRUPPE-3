@@ -3,9 +3,9 @@
 <mat-dialog-content>
     <ul style="list-style-type: none;">
         @for (source of sources(); track source.id) {
-            <li> 
+            <li>
                 <!-- Material Cards for every list element, if not selected, the card is only outlined -->
-                <mat-card [appearance]="selected()?.id === source.id ? 'raised' : 'outlined'"> 
+                <mat-card [appearance]="isSelected(source.id) ? 'raised' : 'outlined'">
                     <mat-card-header>
                         <mat-card-title>{{ source.name }}</mat-card-title>
                         @if (source.description; as description) {
@@ -22,7 +22,7 @@
     </ul>
 
     <button mat-button color="warn" (click)="clear()">Clear Selection</button>
-    
+
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
