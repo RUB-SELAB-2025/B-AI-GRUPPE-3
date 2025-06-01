@@ -137,6 +137,31 @@ export class DataSourceService {
       });
     },
   });
+  readonly pathsx2 = linkedSignal({
+    source: () => ({
+      xScale: this.xScale(),
+      yScale: this.yScale(),
+      series: this.dummySeries(),
+    }),
+    computation: ({ xScale, yScale, series }) => {
+      const lineGen = d3Line<{ time: Date; value: number }>()
+        .x(d => xScale(d.time))
+        .y(d => yScale(d.value));
+
+      return Object.entries(series).map(([key, points]) => {
+        const parsedValues = points.map(({ timestamp, value }) => ({
+          time: new Date(timestamp),
+          value,
+        }));
+
+        const pathData = lineGen(parsedValues) ?? ''; 
+        return {
+          id: key,
+          d: pathData,
+        };
+      });
+    },
+  });
 
 
 

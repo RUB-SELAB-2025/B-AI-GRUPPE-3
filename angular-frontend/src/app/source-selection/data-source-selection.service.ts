@@ -26,7 +26,9 @@ export interface DataSourceInfo  extends DataSource{
 })
 export class DataSourceSelectionService {
     private readonly liveDataService = inject(OmnAIScopeDataService);
-    private readonly _currentSource = signal<DataSourceInfo | null>(null); private readonly dummyDataService = inject(DummyDataService);
+    private readonly _currentSource = signal<DataSourceInfo[]>([]); 
+    private readonly dummyDataService = inject(DummyDataService);
+    private readonly dummyDataServicex2 = inject(DummyDataService);
 
     private readonly _availableSources = signal<DataSourceInfo[]>([
         {
@@ -42,6 +44,13 @@ export class DataSourceSelectionService {
             description: 'Random generated data points',
             connect: this.dummyDataService.connect.bind(this.dummyDataService),
             data: this.dummyDataService.data
+        },
+        {
+            id: 'dummydatax2',
+            name: 'Random Dummy Data x2',
+            description: 'Random generated data points',
+            connect: this.dummyDataService.connect.bind(this.dummyDataService),
+            data: this.dummyDataServicex2.data
         }
     ]);
     readonly availableSources = this._availableSources.asReadonly();
@@ -56,19 +65,23 @@ export class DataSourceSelectionService {
     readonly selectedSourceId = computed(() => this._currentSource()?.id ?? null);
 
     selectSource(source: DataSourceInfo): void {
-        this._currentSource.set(source);
+        this._currentSource.update(source);
+        console.log(this._currentSource);
     }
 
     clearSelection(): void {
-        this._currentSource.set(null);
+        this._currentSource.set([]);
     }
 
-    addSourceToAvailbleSoruces(source: DataSourceInfo) {
-        this._availableSources.update((value) => [...value, source])
+    addSourceToAvailbleSources(source: DataSourceInfo): void {
+        this._availableSources.update((value) => [...value, source]);
     }
+    
     readonly data = computed(() => {
         const source = this._currentSource();
-        if (!source) return signal<Record<string, DataFormat[]>>({});
-        return source.data;
+        if (source.length == 0) return signal([]);
+        return ((source) => {
+            for (const [key, value] of source
+        });
     });
 }
