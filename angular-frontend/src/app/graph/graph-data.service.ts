@@ -17,8 +17,6 @@ export class DataSourceService {
   private readonly $yDomain = signal([0, 100]);
   private readonly dataSourceSelectionService = inject(DataSourceSelectionService);
 
-  private readonly dummySeries = this.dataSourceSelectionService.data;
-
   readonly margin = { top: 20, right: 30, bottom: 40, left: 60 };
   graphDimensions = this.$graphDimensions.asReadonly();
 
@@ -61,11 +59,11 @@ export class DataSourceService {
   }
 
  updateScalesWhenDataChanges = effect(() => {
-    const data = this.dummySeries();
+    const data = this.dataSourceSelectionService.data();
     untracked(() => this.scaleAxisToData(data))
   })
 
-  private scaleAxisToData(data: UnwrapSignal<typeof this.dummySeries>) {
+  private scaleAxisToData(data: UnwrapSignal<typeof this.dataSourceSelectionService.data>) {
     console.log(data)
     if (Object.keys(data).length === 0) return;
 
@@ -110,7 +108,7 @@ export class DataSourceService {
     source: () => ({
       xScale: this.xScale(),
       yScale: this.yScale(),
-      series: this.dummySeries(),
+      series: this.dataSourceSelectionService.data(),
     }),
     computation: ({ xScale, yScale, series }) => {
       const lineGen = d3Line<{ time: Date; value: number }>()
@@ -131,32 +129,5 @@ export class DataSourceService {
       });
     },
   });
-  readonly pathsx2 = linkedSignal({
-    source: () => ({
-      xScale: this.xScale(),
-      yScale: this.yScale(),
-      series: this.dummySeries(),
-    }),
-    computation: ({ xScale, yScale, series }) => {
-      const lineGen = d3Line<{ time: Date; value: number }>()
-        .x(d => xScale(d.time))
-        .y(d => yScale(d.value));
-
-      return Object.entries(series).map(([key, points]) => {
-        const parsedValues = points.map(({ timestamp, value }) => ({
-          time: new Date(timestamp),
-          value,
-        }));
-
-        const pathData = lineGen(parsedValues) ?? '';
-        return {
-          id: key,
-          d: pathData,
-        };
-      });
-    },
-  });
-
-
 
 }
