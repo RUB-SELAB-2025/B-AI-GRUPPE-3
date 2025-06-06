@@ -12,6 +12,7 @@ const config: ForgeConfig = {
     asar: true,
     extraResource: [
       "./res/omnai_BE/MiniOmni.exe", 
+      "./res/omnai_BE/MiniOmni_Ubuntu",
       "./res/omnai_BE/libusb-1.0.dll",
       "./res/omnai_BE/abseil_dll.dll",
       "./res/omnai_BE/libprotobuf.dll",
@@ -24,9 +25,19 @@ const config: ForgeConfig = {
       setupIcon: './images/icon.ico',
       iconUrl: 'https://lugges.s3.nl-ams.scw.cloud/icon-OmnAIView.ico',
     }, ["win32"]), 
+    // MakerDeb needs the packages "fakeroot" and "dpkg" to build the package
+    new MakerDeb({
+      options: {
+        icon: './images/icon.png',
+        maintainer: 'AI-Gruppe',
+        homepage: 'https://github.com/AI-Gruppe/OmnAIView',
+        categories: ['Science']
+      },},
+      ['linux']
+    ),
     new MakerZIP({}, ['darwin']), 
-    new MakerRpm({}), 
-    new MakerDeb({options: {icon: './images/icon.png'}})],
+    new MakerRpm({})
+  ],
   plugins: [
     // Fuses are used to enable/disable various Electron functionality
     // at package time, before code signing the application

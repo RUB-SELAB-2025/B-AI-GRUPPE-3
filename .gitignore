@@ -1,5 +1,9 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
+# Test files 
+angular-frontend/test.ts
+angular-frontend/test.js
+
 # Compiled output
 angular-frontend/dist
 angular-frontend/tmp
@@ -138,3 +142,4 @@ electron/.vite/
 electron/out/
 electron/dist/
 electron/res/angular
+angular-frontend/test.js
