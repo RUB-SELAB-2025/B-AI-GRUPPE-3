@@ -45,15 +45,27 @@ export const omnaiscopeBackendManager = (()=> { // singelton for only one possib
     }
     /**
      * @description Receive the path for the OmnAIScope Backend in production and dev mode. 
-     * !!! Path is hardcoded for both cases
+     * ataneko161: Path for backend file is now set by referencing process.platform
      * @returns hardcoded path for production and dev mode in which the OmnAIScope Backend is currently saved 
      */
     function getBackendPath(): string {
+        let backendName: string;
+        switch (process.platform) { // retrieve platform as string from nodeJS
+            case "win32":
+                backendName = "MiniOmni.exe";
+                break;
+            case "linux":
+                backendName = "MiniOmni_Ubuntu";
+                break;
+            default:
+                backendName = "MiniOmni.exe";
+                break;
+        }
         const exePath: string = app.isPackaged 
-        ? join(process.resourcesPath, "MiniOmni.exe") // production mode 
-        : join(__dirname, "..", "res", "omnai_BE", "MiniOmni.exe") // dev mode 
+        ? join(process.resourcesPath, backendName) // production mode 
+        : join(__dirname, "..", "res", "omnai_BE", backendName) // dev mode 
 
-        return exePath; 
+        return String(exePath); 
     }
     /**
      * @description Starts the local omnai backend on a free port given by the OS

@@ -12,5 +12,8 @@
     "build:electron": "cd electron && npm run make",
     "start:dev": "cd angular-frontend && npm run start",
     "start:electron": "cd electron && npm run start"
+  },
+  "dependencies": {
+    "all": "^0.0.0"
   }
 }
