@@ -1,0 +1,9 @@
+<h1 mat-dialog-title>Select Data Source</h1>
+
+<mat-dialog-content>
+  <input type="file" class="file-input" accept="text/csv" (change)="onFileSelected(fileUpload.files)" multiple #fileUpload>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button mat-button [mat-dialog-close]="selected()" color="primary" [disabled]="!selected()" >Select File</button>
+</mat-dialog-actions>

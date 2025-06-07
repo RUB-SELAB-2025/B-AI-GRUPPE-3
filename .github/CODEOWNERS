@@ -1,0 +1,6 @@
+# this is the list of code owners that are automatically set as code
+# reviewers for a new PR 
+*   @tabeatheunicorn @akmaily @PhilippTheServer @MaxClerkwell
+
+# list of codeowners that are set as code reviewers for md files 
+*.md   @tabeatheunicorn @akmaily @dobe-1 @MaxClerkwell @odinthenerd @PhilippTheServer 

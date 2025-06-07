@@ -2,6 +2,7 @@ import { computed, inject, Injectable, Signal, signal } from '@angular/core';
 import { type DataFormat, OmnAIScopeDataService } from '../omnai-datasource/omnai-scope-server/live-data.service';
 import { Observable } from 'rxjs';
 import { DummyDataService } from '../omnai-datasource/random-data-server/random-data.service';
+ import {CsvFileImportService} from '../omnai-datasource/csv-file-import/csv-file-import.service';
 
 /** Dummy interface to match your expected shape */
 export interface DataPoint {
@@ -27,8 +28,9 @@ export interface DataSourceInfo  extends DataSource{
 })
 export class DataSourceSelectionService {
     private readonly liveDataService = inject(OmnAIScopeDataService);
-    private readonly _currentSource = signal<DataSourceInfo[]>([]);
     private readonly dummyDataService = inject(DummyDataService);
+    private readonly csvDataService = inject(CsvFileImportService);
+    private readonly _currentSource = signal<DataSourceInfo[]>([]);
 
     private readonly _availableSources = signal<DataSourceInfo[]>([
         {
@@ -51,6 +53,13 @@ export class DataSourceSelectionService {
             description: 'Random generated data points',
             connect: this.dummyDataService.connect.bind(this.dummyDataService),
             data: this.dummyDataService.data
+        },
+        {
+            id: 'csv-file',
+            name: 'CSV Data',
+            description: 'Import a CSV file',
+            connect: this.csvDataService.connect.bind(this.csvDataService),
+            data: this.csvDataService.data
         }
     ]);
     readonly availableSources = this._availableSources.asReadonly();
