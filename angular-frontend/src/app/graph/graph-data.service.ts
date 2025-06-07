@@ -1,6 +1,7 @@
 import { computed, effect, inject, Injectable, linkedSignal, signal, untracked } from '@angular/core';
 import { scaleLinear as d3ScaleLinear, scaleUtc as d3ScaleUtc } from 'd3-scale';
 import { line as d3Line } from 'd3-shape';
+import { rgb as d3RGB } from 'd3-color';
 import {  OmnAIScopeDataService } from '../omnai-datasource/omnai-scope-server/live-data.service';
 import { type GraphComponent } from './graph.component';
 import { DataSourceSelectionService } from '../source-selection/data-source-selection.service';
@@ -117,23 +118,20 @@ export class DataSourceService {
         .x(d => xScale(d.time))
         .y(d => yScale(d.value));
 
-      return Object.entries(series).map(([key, points]) => {
-        const parsedValues = points.map(({ timestamp, value, color }) => ({
-          time: new Date(timestamp),
-          value,
-          color
-        }));
-
-        //const colorRGB = parsedValues[2]["color"];
-        //const pathColor = convert.rgb.keyword(colorRGB["r"], colorRGB["g"], colorRGB["b"]);
-
-        const pathData = lineGen(parsedValues) ?? '';
-        return {
-          id: key,
-          d: pathData,
-          color: pass
-        };
-      });
+        return Object.entries(series).map(([key, points]) => {
+          const parsedValues = points.map(({ timestamp, value }) => ({
+            time: new Date(timestamp),
+            value
+          }));
+          const parsedColorArray = points.map((p) => p.color ?? { r: 0, g: 0, b: 255 });  // Parse color value separately so it doesn't interfere with lineGen()
+          const rgbColorString: string = d3RGB(parsedColorArray[0].r, parsedColorArray[0].g, parsedColorArray[0].b).clamp().toString();  // clamp() cleans the RGB values to be between 0...255
+          const pathData = lineGen(parsedValues) ?? '';
+          return { // Data which is available in graph.component.html
+            id: key,
+            d: pathData,
+            color: rgbColorString
+          };
+        });
     },
   });
 

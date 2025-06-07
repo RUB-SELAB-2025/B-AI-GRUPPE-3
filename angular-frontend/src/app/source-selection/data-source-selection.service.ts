@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, Signal, signal } from '@angular/core';
-import { type DataFormat, type DataColorFormat, OmnAIScopeDataService } from '../omnai-datasource/omnai-scope-server/live-data.service';
+import { type DataFormat, OmnAIScopeDataService } from '../omnai-datasource/omnai-scope-server/live-data.service';
 import { Observable } from 'rxjs';
 import { DummyDataService } from '../omnai-datasource/random-data-server/random-data.service';
 
@@ -70,6 +70,7 @@ export class DataSourceSelectionService {
       }
       return false;
     }
+    // Adds source to _currentSource
     selectSource(source: DataSourceInfo): void {
         this._currentSource.update(currentSource => {
           return [...currentSource, source];
@@ -87,7 +88,7 @@ export class DataSourceSelectionService {
         const sources = this._currentSource();
         
         let data:Record<string, DataFormat[]> = {};
-
+        // Concat all data sources into an array
         for (const source of sources) {
           let sourceData = source.data();
           for (const key of Object.keys(sourceData)) {

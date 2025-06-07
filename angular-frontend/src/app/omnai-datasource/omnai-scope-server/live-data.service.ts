@@ -12,7 +12,7 @@ interface DeviceInformation {
 export interface DataFormat {
   timestamp: number;
   value: number;
-  color?: {r: number, g: number, b: number};
+  color?: {r: number, g: number, b: number};  // Added color so it can be used in <svg> in graph.component.html, if there's no RGB value the line is blue (see graph-data.service.paths)
 }
 
 interface DeviceOverview {
