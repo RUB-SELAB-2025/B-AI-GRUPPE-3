@@ -53,15 +53,15 @@ export class DummyDataServicex2 implements DataSource {
             map(() => ([{
                 timestamp: Date.now(),
                 value: Math.random() * 100,
-                color: {r:255,g:0,b:0}
+                color: {r:255,g:0,b:255}
             }, {
                 timestamp: Date.now(),
                 value: Math.random() * 100,
-                color: {r:0,g:255,b:0}
+                color: {r:255,g:255,b:0}
             }, {
                 timestamp: Date.now(),
                 value: Math.random() * 100,
-                color: {r:0,g:0,b:255}
+                color: {r:255,g:128,b:0}
             }]
         ))
         )

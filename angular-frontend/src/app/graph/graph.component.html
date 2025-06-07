@@ -16,7 +16,13 @@
 <div>
     <ul>
         @for (path of dataservice.paths(); track $index) {
-            <li>Id: {{path.id}}, Path: {{path.d}}, Color: {{path.color}}</li>
+            <li>
+            <ul>
+                    <li>Id: {{path.id}}, Color: {{path.color}}</li>
+                    <li>Path: {{path.d}}</li>
+
+            </ul>
+            </li>
         }
     </ul>
 </div>
