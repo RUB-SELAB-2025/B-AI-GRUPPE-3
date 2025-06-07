@@ -1,7 +1,8 @@
 import { computed, inject, Injectable, Signal, signal } from '@angular/core';
-import { type DataFormat, OmnAIScopeDataService } from '../omnai-datasource/omnai-scope-server/live-data.service';
+import { type DataFormat, type DataColorFormat, OmnAIScopeDataService } from '../omnai-datasource/omnai-scope-server/live-data.service';
 import { Observable } from 'rxjs';
 import { DummyDataService } from '../omnai-datasource/random-data-server/random-data.service';
+
 /** Dummy interface to match your expected shape */
 export interface DataPoint {
     x: number;
@@ -73,10 +74,6 @@ export class DataSourceSelectionService {
         this._currentSource.update(currentSource => {
           return [...currentSource, source];
         });
-        console.log("Select Source");
-        for (const [key, value] of Object.entries(this._currentSource)) {
-            console.log(key.toString() + " # " + value.toString());
-        }
     }
 
     clearSelection(): void {
@@ -88,6 +85,7 @@ export class DataSourceSelectionService {
     }
     readonly data = computed(() => {
         const sources = this._currentSource();
+        
         let data:Record<string, DataFormat[]> = {};
 
         for (const source of sources) {

@@ -4,6 +4,8 @@ import { line as d3Line } from 'd3-shape';
 import {  OmnAIScopeDataService } from '../omnai-datasource/omnai-scope-server/live-data.service';
 import { type GraphComponent } from './graph.component';
 import { DataSourceSelectionService } from '../source-selection/data-source-selection.service';
+import { color } from 'd3';
+
 
 type UnwrapSignal<T> = T extends import('@angular/core').Signal<infer U> ? U : never;
 
@@ -108,7 +110,7 @@ export class DataSourceService {
     source: () => ({
       xScale: this.xScale(),
       yScale: this.yScale(),
-      series: this.dataSourceSelectionService.data(),
+      series: this.dataSourceSelectionService.data()
     }),
     computation: ({ xScale, yScale, series }) => {
       const lineGen = d3Line<{ time: Date; value: number }>()
@@ -116,15 +118,20 @@ export class DataSourceService {
         .y(d => yScale(d.value));
 
       return Object.entries(series).map(([key, points]) => {
-        const parsedValues = points.map(({ timestamp, value }) => ({
+        const parsedValues = points.map(({ timestamp, value, color }) => ({
           time: new Date(timestamp),
           value,
+          color
         }));
+
+        //const colorRGB = parsedValues[2]["color"];
+        //const pathColor = convert.rgb.keyword(colorRGB["r"], colorRGB["g"], colorRGB["b"]);
 
         const pathData = lineGen(parsedValues) ?? '';
         return {
           id: key,
           d: pathData,
+          color: pass
         };
       });
     },

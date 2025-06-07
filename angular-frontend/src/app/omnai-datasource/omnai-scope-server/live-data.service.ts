@@ -11,6 +11,7 @@ interface DeviceInformation {
 export interface DataFormat {
   timestamp: number;
   value: number;
+  color?: {r: number, g: number, b: number};
 }
 
 interface DeviceOverview {
