@@ -45,12 +45,19 @@ git add .
 git commit
 ```
 
-It is expected that commits dont only have a header but also 
-1. Why did you add/change something ? 
-2. What did you add/change in the commit ? 
-3. Possible important things to know about the commit 
+It is expected that commits don't only have a header but also 
+1. Why did you add/change something? 
+2. What did you add/change in the commit? 
+3. Possible important things to know about the commit.
 
-## 6. Push to Your Fork
+## 6. Document your changes in the changelog 
+
+To keep track of changes between different versions a changelog according to the (keepAChangelog)[https://keepachangelog.com/en/1.1.0/]
+is used. 
+
+It is expected that new changes are documented in this changelog. 
+
+## 7. Push to Your Fork
 
 Push your branch to your fork:
 
@@ -58,21 +65,21 @@ Push your branch to your fork:
 git push origin \<branchname\>
 ```
 
-# Open a Pull Request
+## 8. Open a Pull Request
 
 1. Go to the original repository on GitHub.
 2. Click **New Pull Request**.
 3. Select your fork and branch.
-4. Provide a **clear description** of your changes.
+4. Provide a **clear description** of your changes. Please follow our [pull request template](.github/PULL_REQUEST_TEMPLATE.md).
 5. Submit the pull request.
 
-## 8. Review & Approval
+## 9. Review & Approval
 
 - PRs must be reviewed by at least **two maintainers**.
 - Address requested changes by updating your branch and pushing updates.
 - Once approved, the PR will be merged by one of the maintainers. 
 
-## 9. Keep Your Fork Updated
+## 10. Keep Your Fork Updated
 
 To stay up to date with the latest changes: 
 
@@ -89,7 +96,7 @@ Make sure that you have added the upstream to your git repo with:
 git remote add upstream git@github.com:AI-Gruppe/OmnAIView.git
 ```
 
-## 10. Reporting Issues
+## 11. Reporting Issues
 
 If you find a bug or have a feature request, please open an [issue](https://github.com/AI-Gruppe/OmnAIView/issues) and describe it clearly.
 
