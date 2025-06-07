@@ -52,7 +52,7 @@ export class DataSourceSelectionService {
             id: 'dummydatax2',
             name: 'Random Dummy Data x2',
             description: 'Random generated data points',
-            connect: this.dummyDataService.connect.bind(this.dummyDataServicex2),
+            connect: this.dummyDataServicex2.connect.bind(this.dummyDataServicex2),
             data: this.dummyDataServicex2.data
         },
         {
