@@ -24,6 +24,10 @@ export class SourceSelectModalComponent {
         this.datasourceService.selectSource(source);
     }
 
+    removeSelected(source: DataSourceInfo) {
+        this.datasourceService.removeSelectedSource(source);
+    }
+
     isSelected(targetId: string): boolean {
       return this.datasourceService.isSelected(targetId);
     }

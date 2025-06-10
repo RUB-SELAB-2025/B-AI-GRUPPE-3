@@ -94,6 +94,14 @@ export class DataSourceSelectionService {
     addSourceToAvailbleSources(source: DataSourceInfo) {
         this._availableSources.update((value) => [...value, source])
     }
+
+    removeSelectedSource(source: DataSourceInfo): void {
+        this._currentSource.update(currentSource => {
+            const index = currentSource.indexOf(source);
+            return [...currentSource.slice(0, index),...currentSource.slice(index + 1)];
+        });
+    }
+
     readonly data = computed(() => {
         const sources = this._currentSource();
         

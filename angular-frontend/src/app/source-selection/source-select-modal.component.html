@@ -14,7 +14,7 @@
                     </mat-card-header>
                     <mat-card-actions>
                         @if (isSelected(source.id)) {
-                            <button mat-button (click)="select(source)">DESTROY!!!!!!!</button>
+                            <button mat-button (click)="removeSelected(source)">DESTROY!!!!!!!</button>
                         } @else {
                             <button mat-button (click)="select(source)">Select</button>
                         }
