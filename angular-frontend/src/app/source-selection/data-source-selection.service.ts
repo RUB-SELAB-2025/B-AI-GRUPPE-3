@@ -91,7 +91,7 @@ export class DataSourceSelectionService {
         this._currentSource.set([]);
     }
 
-    addSourceToAvailbleSoruces(source: DataSourceInfo) {
+    addSourceToAvailbleSources(source: DataSourceInfo) {
         this._availableSources.update((value) => [...value, source])
     }
     readonly data = computed(() => {

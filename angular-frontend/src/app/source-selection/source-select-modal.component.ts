@@ -19,9 +19,11 @@ export class SourceSelectModalComponent {
 
 
     private readonly dialogRef = inject(MatDialogRef<SourceSelectModalComponent>);
+    
     select(source: DataSourceInfo) {
         this.datasourceService.selectSource(source);
     }
+
     isSelected(targetId: string): boolean {
       return this.datasourceService.isSelected(targetId);
     }
