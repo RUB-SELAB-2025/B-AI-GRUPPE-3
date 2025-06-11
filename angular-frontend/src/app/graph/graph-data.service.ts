@@ -2,13 +2,34 @@ import { computed, effect, inject, Injectable, linkedSignal, signal, untracked }
 import { scaleLinear as d3ScaleLinear, scaleUtc as d3ScaleUtc } from 'd3-scale';
 import { line as d3Line } from 'd3-shape';
 import { rgb as d3RGB, rgb } from 'd3-color';
-import {  OmnAIScopeDataService } from '../omnai-datasource/omnai-scope-server/live-data.service';
+import {DataFormat, OmnAIScopeDataService} from '../omnai-datasource/omnai-scope-server/live-data.service';
 import { type GraphComponent } from './graph.component';
-import { DataSourceSelectionService } from '../source-selection/data-source-selection.service';
+import {DataInfo, DataSourceSelectionService} from '../source-selection/data-source-selection.service';
 import { color } from 'd3';
 
 
 type UnwrapSignal<T> = T extends import('@angular/core').Signal<infer U> ? U : never;
+
+/**
+ * A type to signal, that the last {@link width} milliseconds should be displayed
+ */
+interface FixedWindow {
+  type: 'fixed';
+  width: number;
+}
+
+/**
+ * A type to signal, that only everything between {@link AdjustableWindow.start} and {@link AdjustableWindow.end} should be displayed.
+ * {@link AdjustableWindow.start} and {@link AdjustableWindow.end} are interpreted as a Millisecond timestamps from the Unix-Epoch, as per {@link DateConstructor.(:CONSTRUCTOR)}
+ */
+interface AdjustableWindow {
+  type: 'adjustable';
+  start?: number;
+  end?: number;
+}
+
+type WindowDataAdjust = FixedWindow | AdjustableWindow;
+
 
 /**
  * Provide the data to be displayed in the {@link GraphComponent}
@@ -25,8 +46,72 @@ export class DataSourceService {
   readonly margin = {top: 20, right: 30, bottom: 40, left: 60};
   graphDimensions = this.$graphDimensions.asReadonly();
 
-  readonly data = computed(()=>{
-    return this.dataSourceSelectionService.data();
+  /**
+   * This represents how the {@link DataSourceService.data} signal will be filtered
+   */
+  readonly range = signal<WindowDataAdjust>({
+    type: 'fixed',
+    width: 25_000,
+  });
+  /**
+   * Continually Calculates minima and maxima across all Signals for the X and Y axis, whilst respecting {@link DataSourceService.range}
+   */
+  readonly info = computed(() => {
+    const data = this.dataSourceSelectionService.data();
+
+    //Get Raw DataInfo
+    const info = new DataInfo();
+    //TODO: This could be sped up. https://github.com/AI-Gruppe/OmnAIView/pull/25
+    for (const points of Object.values(data)) {
+      info.applyDataPoints(points);
+    }
+
+    //Apply range info onto that Data Info
+    const range = this.range();
+    if (range.type == 'fixed') {
+      info.minTimestamp = info.maxTimestamp - range.width;
+    } else if (range.type == 'adjustable') {
+      if (range.end) info.maxTimestamp = range.end;
+      if (range.start) info.minTimestamp = range.start;
+    }
+
+    return info;
+  })
+  /**
+   * A signal, which is filtered according to {@link DataSourceService.range}.
+   */
+  readonly data = computed(() => {
+    let data = this.dataSourceSelectionService.data();
+    const range = this.range();
+    let newData: Record<string, DataFormat[]> = {};
+    if (range.type === 'adjustable') {
+      // fast path, for if we know, we don't need to filter anything
+      // this is the case, if start is either undefined or NEGATIVE_INFINITY
+      // and end is undefined or POSITIVE_INFINITY
+      if (
+        (range.start === undefined || range.start === Number.NEGATIVE_INFINITY) &&
+        (range.end === undefined || range.end === Number.POSITIVE_INFINITY)
+      ) {
+        newData = data;
+      }
+      //Otherwise filter according to the given description
+      else {
+       for (const [key, value] of Object.entries(data)) {
+         newData[key] = value.filter(v=>
+           v.timestamp < (range.end ?? Number.POSITIVE_INFINITY) &&
+             v.timestamp > (range.start ?? Number.NEGATIVE_INFINITY)
+         )
+       }
+      }
+    } else if (range.type === 'fixed') {
+      const info = this.info();
+      //info will already have applied the range info. minTimestamp will therefore be the correct value.
+      for (const [key, value] of Object.entries(data)) {
+        newData[key] = value.filter(v=> v.timestamp > info.minTimestamp)
+      }
+    }
+
+    return newData;
   })
 
   xScale = linkedSignal({
