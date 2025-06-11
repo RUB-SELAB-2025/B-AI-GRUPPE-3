@@ -25,6 +25,10 @@ export class DataSourceService {
   readonly margin = {top: 20, right: 30, bottom: 40, left: 60};
   graphDimensions = this.$graphDimensions.asReadonly();
 
+  readonly data = computed(()=>{
+    return this.dataSourceSelectionService.data();
+  })
+
   xScale = linkedSignal({
     source: () => ({
       dimensions: this.$graphDimensions(),
@@ -64,11 +68,11 @@ export class DataSourceService {
   }
 
   updateScalesWhenDataChanges = effect(() => {
-    const data = this.dataSourceSelectionService.data();
+    const data = this.data();
     untracked(() => this.scaleAxisToData(data))
   })
 
-  private scaleAxisToData(data: UnwrapSignal<typeof this.dataSourceSelectionService.data>) {
+  private scaleAxisToData(data: UnwrapSignal<typeof this.data>) {
     console.log(data)
     if (Object.keys(data).length === 0) return;
 
@@ -113,7 +117,7 @@ export class DataSourceService {
     source: () => ({
       xScale: this.xScale(),
       yScale: this.yScale(),
-      series: this.dataSourceSelectionService.data()
+      series: this.data()
     }),
     computation: ({xScale, yScale, series}) => {
       const lineGen = d3Line<{ time: Date; value: number }>()
