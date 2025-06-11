@@ -1,11 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 import {CsvFileImportService} from './csv-file-import.service';
+import {provideHttpClient} from '@angular/common/http';
 
 describe('CsvFileImport', () => {
   let service: CsvFileImportService;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient()
+      ]
+    }).compileComponents();
     service = TestBed.inject(CsvFileImportService);
   });
 

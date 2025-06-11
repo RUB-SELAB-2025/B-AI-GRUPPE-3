@@ -13,14 +13,16 @@ type UnwrapSignal<T> = T extends import('@angular/core').Signal<infer U> ? U : n
 /**
  * Provide the data to be displayed in the {@link GraphComponent}
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class DataSourceService {
-  private readonly $graphDimensions = signal({ width: 800, height: 600 });
+  private readonly $graphDimensions = signal({width: 800, height: 600});
   private readonly $xDomain = signal([new Date(2020), new Date()]);
   private readonly $yDomain = signal([0, 100]);
   private readonly dataSourceSelectionService = inject(DataSourceSelectionService);
 
-  readonly margin = { top: 20, right: 30, bottom: 40, left: 60 };
+  readonly margin = {top: 20, right: 30, bottom: 40, left: 60};
   graphDimensions = this.$graphDimensions.asReadonly();
 
   xScale = linkedSignal({
@@ -28,8 +30,8 @@ export class DataSourceService {
       dimensions: this.$graphDimensions(),
       xDomain: this.$xDomain(),
     }),
-    computation: ({ dimensions, xDomain }) => {
-      const margin = { top: 20, right: 30, bottom: 40, left: 40 };
+    computation: ({dimensions, xDomain}) => {
+      const margin = {top: 20, right: 30, bottom: 40, left: 40};
       const width = dimensions.width - margin.left - margin.right;
       return d3ScaleUtc()
         .domain(xDomain)
@@ -42,8 +44,8 @@ export class DataSourceService {
       dimensions: this.$graphDimensions(),
       yDomain: this.$yDomain(),
     }),
-    computation: ({ dimensions, yDomain }) => {
-      const margin = { top: 20, right: 30, bottom: 40, left: 40 };
+    computation: ({dimensions, yDomain}) => {
+      const margin = {top: 20, right: 30, bottom: 40, left: 40};
       const height = dimensions.height - margin.top - margin.bottom;
       return d3ScaleLinear()
         .domain(yDomain)
@@ -57,11 +59,11 @@ export class DataSourceService {
       currentSettings.width !== settings.width ||
       currentSettings.height !== settings.height
     ) {
-      this.$graphDimensions.set({ width: settings.width, height: settings.height });
+      this.$graphDimensions.set({width: settings.width, height: settings.height});
     }
   }
 
- updateScalesWhenDataChanges = effect(() => {
+  updateScalesWhenDataChanges = effect(() => {
     const data = this.dataSourceSelectionService.data();
     untracked(() => this.scaleAxisToData(data))
   })
@@ -113,23 +115,23 @@ export class DataSourceService {
       yScale: this.yScale(),
       series: this.dataSourceSelectionService.data()
     }),
-    computation: ({ xScale, yScale, series }) => {
+    computation: ({xScale, yScale, series}) => {
       const lineGen = d3Line<{ time: Date; value: number }>()
         .x(d => xScale(d.time))
         .y(d => yScale(d.value));
 
-        return Object.entries(series).map(([key, points]) => {
-          const parsedValues = points.map(({ timestamp, value }) => ({
-            time: new Date(timestamp),
-            value
-          }));
-          const parsedColorArray = points.map((p) => p.color ?? { r: 0, g: 0, b: 255 });  // Parse color value separately so it doesn't interfere with lineGen()
-          const rgbColorString: string = d3RGB(parsedColorArray[0].r, parsedColorArray[0].g, parsedColorArray[0].b).clamp().toString();  // clamp() cleans the RGB values to be between 0...255
-          const pathData = lineGen(parsedValues) ?? '';
-          return { // Data which is available in graph.component.html
-            id: key,
-            d: pathData,
-            color: rgbColorString
+      return Object.entries(series).map(([key, points]) => {
+        const parsedValues = points.map(({timestamp, value}) => ({
+          time: new Date(timestamp),
+          value
+        }));
+        const parsedColorArray = points.map((p) => p.color ?? {r: 0, g: 0, b: 255});  // Parse color value separately so it doesn't interfere with lineGen()
+        const rgbColorString: string = d3RGB(parsedColorArray[0].r, parsedColorArray[0].g, parsedColorArray[0].b).clamp().toString();  // clamp() cleans the RGB values to be between 0...255
+        const pathData = lineGen(parsedValues) ?? '';
+        return { // Data which is available in graph.component.html
+          id: key,
+          d: pathData,
+          color: rgbColorString
           };
         });
     },
