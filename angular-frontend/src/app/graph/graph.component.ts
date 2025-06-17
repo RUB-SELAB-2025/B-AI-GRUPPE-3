@@ -28,10 +28,14 @@ import { DataSourceService } from './graph-data.service';
 })
 export class GraphComponent {
   readonly dataservice = inject(DataSourceService);
-  readonly viewPort = new DataSourceService();
   readonly svgGraph = viewChild.required<ElementRef<SVGElement>>('graphContainer');
   readonly axesContainer = viewChild.required<ElementRef<SVGGElement>>('xAxis');
   readonly axesYContainer = viewChild.required<ElementRef<SVGGElement>>('yAxis');
+
+  readonly viewPort = new DataSourceService();
+  readonly svgGraph1 = viewChild.required<ElementRef<SVGElement>>('graphContainer1');
+  readonly axesContainer1 = viewChild.required<ElementRef<SVGGElement>>('xAxis1');
+  readonly axesYContainer1 = viewChild.required<ElementRef<SVGGElement>>('yAxis1');
 
   private readonly platform = inject(PLATFORM_ID);
   isInBrowser = isPlatformBrowser(this.platform);
@@ -44,6 +48,9 @@ export class GraphComponent {
         if (rect.width > 0 && rect.height > 0) {
           this.dataservice.updateGraphDimensions({ width: rect.width, height: rect.height });
         }
+        const rect1 = this.svgGraph1().nativeElement.getBoundingClientRect();
+        if (rect1.width > 0 && rect1.height > 0)
+          this.viewPort.updateGraphDimensions({ width: rect1.width, height: rect1.height });
       });
     }
   }
@@ -93,6 +100,20 @@ export class GraphComponent {
     if(!this.isInBrowser) return;
     const y = this.dataservice.yScale();
     const g = this.axesYContainer().nativeElement;
+    select(g).transition(transition()).duration(300).call(axisLeft(y));
+  });
+
+  updateXAxis1InCanvas = effect(() => {
+    if (!this.isInBrowser) return;
+    const x = this.viewPort.xScale()
+    const g = this.axesContainer1().nativeElement;
+    select(g).transition(transition()).duration(300).call(axisBottom(x));
+  });
+
+  updateYAxis1InCanvas = effect(() => {
+    if(!this.isInBrowser) return;
+    const y = this.viewPort.yScale();
+    const g = this.axesYContainer1().nativeElement;
     select(g).transition(transition()).duration(300).call(axisLeft(y));
   });
 
