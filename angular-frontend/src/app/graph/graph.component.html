@@ -6,7 +6,7 @@
     </g>
     <g #yAxis1 [attr.transform]="yAxis1TransformString()"></g>
     @for (path of viewPort.paths(); track $index) {
-      <path [attr.d]="path.d" fill="none" stroke="steelblue" stroke-width="2" />
+      <path [attr.d]="path.d" fill="none" [attr.stroke]="path.color" stroke-width="2" />
     }
   </g>
 </svg>
