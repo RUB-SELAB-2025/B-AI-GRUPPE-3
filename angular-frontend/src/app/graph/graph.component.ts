@@ -59,13 +59,11 @@ export class GraphComponent {
 
   xAxisTransformString = computed(() => {
     const yScale = this.dataservice.yScale();
-    console.log("xAxisTransformString= " + yScale.range()[0]);
     return `translate(0, ${yScale.range()[0]})`; // for d3, (0,0) is the upper left hand corner. When looking at data, the lower left hand corner is (0,0) 
   });
 
   yAxisTransformString = computed(() => {
     const xScale = this.dataservice.xScale();
-    console.log("yAxisTransformString= " + xScale.range()[0]);
     return `translate(${xScale.range()[0]}, 0)`;
   });
 
@@ -95,13 +93,17 @@ export class GraphComponent {
     const svg = this.svgGraph().nativeElement;
     const parentSVG = select('svg');
 
+    // Add graph and x-Axis to content
     const contentItems = rootG.selectAll('*')
     const content = rootG.append('g')
       .attr('transform', 'translate(' + rectG.x + ',' + rectG.y + ')')
       .attr('id', 'contentG');
+    console.log(content);
     contentItems.each( function(p, j) {
-      content.select("#contentG").append(this);
+      const el = this;
+      content.append(() => {return el;});
     })
+    console.log(content);
   
     const clipRect = parentSVG.append('clipPath').attr('id', 'scrollbox-clip-path').append('rect');  // Clip everything outside of g rectangle
     clipRect
@@ -109,7 +111,7 @@ export class GraphComponent {
       .attr('y', sizeG.y)
       .attr('width', sizeG.width)
       .attr('height', sizeG.height)
-      .attr('transform', 'translate(' + rectG.x + ',0)');  // x is at 0, so add offset
+      .attr('transform', 'translate(' + rectG.x + ',0)');  // sizeG.x is at 0, so add offset
 
     rootG  // Add invisible rectangle which catches scroll actions
       .insert('rect', 'g')
