@@ -5,8 +5,8 @@
 
     </g>
     <g #yAxis1 [attr.transform]="yAxis1TransformString()"></g>
-    @for (path of viewPort.paths(); track $index) {
-      <path [attr.d]="path.d" fill="none" [attr.stroke]="path.color" stroke-width="2" />
+    @for (path of viewPort.paths(); track $index) {  <!--Copy of dataservice svg-->
+      <path [attr.d]="path.d" fill="none" [attr.stroke]="path.color" stroke-width="2" />  
     }
   </g>
 </svg>
@@ -18,29 +18,29 @@
         </g>
         <g #yAxis [attr.transform]="yAxisTransformString()"></g>
         @for (path of dataservice.paths(); track $index) {
-            <path [attr.d]="path.d" fill="none" [attr.stroke]="path.color" stroke-width="2" />
+            <path [attr.d]="path.d" fill="none" [attr.stroke]="path.color" stroke-width="2" />  <!--Changed stroke, so it uses the color value in path-->
         }
     </g>
 </svg>
 <app-start-data-button />
 <app-device-list />
 
-<div>
-    <ul>
-        @for (path of dataservice.paths(); track $index) {
-            <li>
-            <ul>
-                    <li>Id: {{path.id}}, Color: {{path.color}}</li>
-                    <li>Path: {{path.d}}</li>
-
-            </ul>
-            </li>
-        }
-    </ul>
-</div>
-
-<div style="display: none;"> <!---->
+<div> <!-- style="display: none;"-->
     <h4>Debug Output</h4>
+
+    <div>  <!--Debug information for incoming path data-->
+        <ul>
+            @for (path of dataservice.paths(); track $index) {
+                <li>
+                <ul>
+                        <li>Id: {{path.id}}, Color: {{path.color}}</li>
+                        <li>Path: {{path.d}}</li>
+
+                </ul>
+                </li>
+            }
+        </ul>
+    </div>
 
     <div>
         <strong>X Scale Domain:</strong>

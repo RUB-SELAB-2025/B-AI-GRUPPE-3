@@ -12,7 +12,7 @@ interface DeviceInformation {
 export interface DataFormat {
   timestamp: number;
   value: number;
-  color?: {r: number, g: number, b: number};  // Added color so it can be used in <svg> in graph.component.html, if there's no RGB value the line is blue (see graph-data.service.paths)
+  color?: {r: number, g: number, b: number};  // Added color so it can be used in <svg> in graph.component.html, if there's no RGB value the line is teal (see graph-data.service.paths)
 }
 
 interface DeviceOverview {
@@ -116,7 +116,7 @@ export class OmnAIScopeDataService implements DataSource{
             const existingData = records[uuid] ?? [];
             const newDataPoints = parsedMessage.data.map((point: any) => ({
               timestamp: point.timestamp,
-              value: point.value[index],
+              value: point.value[index]
             }));
             records[uuid] = existingData.concat(newDataPoints);
           });

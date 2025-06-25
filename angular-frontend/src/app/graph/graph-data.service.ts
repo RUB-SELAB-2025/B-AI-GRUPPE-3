@@ -214,9 +214,9 @@ export class DataSourceService {
           time: new Date(timestamp),
           value
         }));
-        const parsedColorArray = points.map((p) => p.color ?? {r: 0, g: 0, b: 255});  // Parse color value separately so it doesn't interfere with lineGen()
-        const rgbColorString: string = d3RGB(parsedColorArray[0].r, parsedColorArray[0].g, parsedColorArray[0].b).clamp().toString();  // clamp() cleans the RGB values to be between 0...255
-        const pathData = lineGen(parsedValues) ?? '';
+        const parsedColorArray = points.map((p) => p.color ?? {r: 72, g: 201, b: 176});  // 72, 201, 176  Parse color value separately so it doesn't interfere with lineGen(), if there's no color value use teal
+        const rgbColorString: string = d3RGB(parsedColorArray[0].r, parsedColorArray[0].g, parsedColorArray[0].b).clamp().toString();  // Parses RGB color value with d3 method, clamp() cleans the RGB values to be between 0...255, returns string useable by html
+        const pathData = lineGen(parsedValues) ?? '';  // Generated SVG path
         return { // Data which is available in graph.component.html
           id: key,
           d: pathData,
