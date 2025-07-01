@@ -6,7 +6,7 @@
     </g>
     <g #yAxis1 [attr.transform]="yAxis1TransformString()"></g>
     @for (path of viewPort.paths(); track $index) {  <!--Copy of dataservice svg-->
-      <path [attr.d]="path.d" fill="none" [attr.stroke]="path.color" stroke-width="2" />  
+      <path [attr.d]="path.d" fill="none" [attr.stroke]="path.color" stroke-width="2" />
     }
   </g>
 </svg>
@@ -24,6 +24,7 @@
 </svg>
 <app-start-data-button />
 <app-device-list />
+<button (click)="clearData()">Clear Data</button>
 <mat-slide-toggle [checked]="xAxisTimeMode() === 'relative'" (change)="onXAxisTimeModeToggle($event.checked)">
   Relative Time
 </mat-slide-toggle>

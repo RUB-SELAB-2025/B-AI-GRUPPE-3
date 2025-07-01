@@ -25,6 +25,10 @@ export class CsvFileImportService implements DataSource {
   private readonly $data = signal<Record<string, DataFormat[]>>({});
   readonly data = this.$data.asReadonly();
 
+  clearData() {
+    this.files.set([])
+  }
+
   /**
    * Processes file content and transforms it into a record entry.
    * If parsing goes wrong a {@link CsvFileImportErrorKind} is thrown.

@@ -160,6 +160,10 @@ export class OmnAIScopeDataService implements DataSource {
     });
   }
 
+  clearData() {
+    this.data.set({})
+  }
+
   // WebSocket-Verbindung schließen
   disconnect(): void {
     if (this.socket) {

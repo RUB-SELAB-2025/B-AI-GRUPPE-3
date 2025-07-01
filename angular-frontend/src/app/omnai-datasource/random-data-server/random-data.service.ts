@@ -9,7 +9,7 @@ import { DataFormat } from '../omnai-scope-server/live-data.service';
 export class DummyDataService implements DataSource {
     private readonly _data = signal<Record<string, DataFormat[]>>({});
 
-    readonly data = this._data.asReadonly(); 
+    readonly data = this._data.asReadonly();
     connect(): void {
         interval(1000)
         .pipe(
@@ -37,6 +37,9 @@ export class DummyDataService implements DataSource {
             }));
         });
     }
+    clearData() {
+      this._data.set({})
+    }
 }
 
 /*
@@ -46,7 +49,7 @@ export class DummyDataService implements DataSource {
 export class DummyDataServicex2 implements DataSource {
     private readonly _data = signal<Record<string, DataFormat[]>>({});
 
-    readonly data = this._data.asReadonly(); 
+    readonly data = this._data.asReadonly();
     connect(): void {
         interval(1000)
         .pipe(
@@ -73,5 +76,8 @@ export class DummyDataServicex2 implements DataSource {
                 "003": [...(current['003'] ?? []), point[2]]
             }));
         });
+    }
+    clearData() {
+      this._data.set({})
     }
 }

@@ -20,6 +20,7 @@ import { ResizeObserverDirective } from '../shared/resize-observer.directive';
 import { StartDataButtonComponent } from "../source-selection/start-data-from-source.component";
 import { DataSourceService } from './graph-data.service';
 import { makeXAxisTickFormatter, type xAxisMode } from './x-axis-formatter.utils';
+import {DataSource, DataSourceSelectionService} from '../source-selection/data-source-selection.service';
 
 @Component({
   selector: 'app-graph',
@@ -31,6 +32,7 @@ import { makeXAxisTickFormatter, type xAxisMode } from './x-axis-formatter.utils
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GraphComponent {
+  readonly dataSourceSelection = inject(DataSourceSelectionService);
   readonly dataservice = inject(DataSourceService);
   readonly svgGraph = viewChild.required<ElementRef<SVGElement>>('graphContainer');
   readonly axesContainer = viewChild.required<ElementRef<SVGGElement>>('xAxis');
@@ -130,5 +132,9 @@ export class GraphComponent {
     const g = this.axesYContainer1().nativeElement;
     select(g).transition(transition()).duration(300).call(axisLeft(y));
   });
-
+  clearData() {
+    for (let test of this.dataSourceSelection.availableSources()) {
+      test.clearData();
+    }
+  }
 }
