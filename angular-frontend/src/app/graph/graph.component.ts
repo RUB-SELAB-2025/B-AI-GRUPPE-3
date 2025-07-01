@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { transition } from 'd3';
 import { axisBottom, axisLeft } from 'd3-axis';
-import { select } from 'd3-selection';
+import { pointer, select } from 'd3-selection';
 import { DeviceListComponent } from "../omnai-datasource/omnai-scope-server/devicelist.component";
 import { ResizeObserverDirective } from '../shared/resize-observer.directive';
 import { StartDataButtonComponent } from "../source-selection/start-data-from-source.component";
@@ -53,6 +53,22 @@ export class GraphComponent {
           this.viewPort.updateGraphDimensions({ width: rect1.width, height: rect1.height });
       });
     }
+    const svg = select('svg');
+    let mousePositions = [];/*
+    this.svgGraph().nativeElement.addEventListener("keydown", function(event){
+        console.log("testg");
+        if(event.key === "m" || event.key === "M"){
+            mousePositions.push(pointer(event)[0], pointer(event)[1]);
+            console.log("Registered: ", mousePositions[mousePositions.length-1]);
+        }
+    });*/
+    select(this.svgGraph().nativeElement).on("keydown", function(event){
+        if(event.key === "m" || event.key === "M"){
+            mousePositions.push(pointer(event)[0], pointer(event)[1]);
+            console.log("Registered: ", mousePositions[mousePositions.length-1]);
+        }
+    })
+
   }
 
   updateGraphDimensions(dimension: { width: number, height: number }) {
