@@ -137,9 +137,17 @@ export class GraphComponent {
       test.clearData();
     }
   }
-  stopData() {
-    for (let test of this.dataSourceSelection.availableSources()) {
-      test.disconnect();
+  public stopped = false;
+  toggleData() {
+    if (this.stopped) {
+      for (let test of this.dataSourceSelection.currentSource()) {
+        test.connect();
+      }
+    } else {
+      for (let test of this.dataSourceSelection.availableSources()) {
+        test.disconnect();
+      }
     }
+    this.stopped = !this.stopped;
   }
 }
