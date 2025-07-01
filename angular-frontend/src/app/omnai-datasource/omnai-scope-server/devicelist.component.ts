@@ -1,12 +1,12 @@
 // src/app/components/device-list/device-list.component.ts
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { OmnAIScopeDataService } from './live-data.service';
 
 @Component({
     selector: 'app-device-list',
     templateUrl: './devicelist.component.html',
-    imports: [CommonModule],
+    imports: [],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DeviceListComponent {

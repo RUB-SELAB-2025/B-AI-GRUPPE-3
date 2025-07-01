@@ -1,17 +1,26 @@
 import { TestBed } from '@angular/core/testing';
-
 import { DataSourceService } from './graph-data.service';
-import {provideHttpClient} from '@angular/common/http';
+import { signal } from '@angular/core';
+import { DataSourceSelectionService } from '../source-selection/data-source-selection.service';
+
+class MockDataSourceSelectionService {
+  currentSource = signal<{ data: () => Record<string, { timestamp: number; value: number }[]> } | null>(null);
+}
 
 describe('GraphDataService', () => {
   let service: DataSourceService;
+  let mockSelectionService: MockDataSourceSelectionService;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  beforeEach(() => {
+    mockSelectionService = new MockDataSourceSelectionService();
+
+    TestBed.configureTestingModule({
       providers: [
-        provideHttpClient()
+        DataSourceService,
+        { provide: DataSourceSelectionService, useValue: mockSelectionService },
       ]
-    }).compileComponents();
+    });
+
     service = TestBed.inject(DataSourceService);
   });
 

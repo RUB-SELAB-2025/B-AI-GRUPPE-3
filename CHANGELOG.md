@@ -28,8 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add Icon (#19)
 - Adding compodoc (#23)
 - Adding changelog information to the Contribution.md (#41)
+- Add version-script to obtain package.json information (#35)
 - Add import for csv-files (#39)
 Formatting needs to be similar to the dataformat of the old OmnAIView data exports. For more infos, see comments in code.
+- Added automatic device polling every 15 Seconds (#35)
+- Add axis mode: Allow to switch between absolute and relative x-axis timestamps(#58)
 
 ### Changed 
 
@@ -37,7 +40,17 @@ Formatting needs to be similar to the dataformat of the old OmnAIView data expor
 - Modernize codebase to Angular 19 (inject, signals, @if/@for, etc.) (#18)
 - Configure Angular Material with a custom theme (#18)
 - Fix the Port selection for the OmnAIScope backend (#19)
+- If electron-squirrel-startup is not avaliable the app crashes without logging. Therefore wrapping in try/catch. (#80)
+- Update x-axis labels to use hours, minutes, seconds instead of year (#58)
+- Reduce file size of csv-file-import.service.spec.ts by replacing hard-coded string (#78)
+- Privacy oriented default setting to not share data with Google (#82)
+- Fixed ci and `package-lock.json` files to allow installing the project with `npm ci` (#83)
+
 
 ### Removed 
 
-- Deletetion of deprecated Angular 18 patterns (#18)
+- Deletion of deprecated Angular 18 patterns (#18)
+- Deletion of duplicated AsyncAPI description for OmnAIBackend 
+- BREAKING CHANGE: Remove `package.json` build scripts in subfolders (#35)
+
+

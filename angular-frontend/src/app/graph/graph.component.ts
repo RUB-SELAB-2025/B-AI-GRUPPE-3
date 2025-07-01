@@ -6,16 +6,20 @@ import {
   effect,
   inject,
   PLATFORM_ID,
+  signal,
   viewChild,
   type ElementRef
 } from '@angular/core';
-import { transition } from 'd3';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { NumberValue, transition } from 'd3';
 import { axisBottom, axisLeft } from 'd3-axis';
 import { select } from 'd3-selection';
+import { timeFormat } from 'd3-time-format';
 import { DeviceListComponent } from "../omnai-datasource/omnai-scope-server/devicelist.component";
 import { ResizeObserverDirective } from '../shared/resize-observer.directive';
 import { StartDataButtonComponent } from "../source-selection/start-data-from-source.component";
 import { DataSourceService } from './graph-data.service';
+import { makeXAxisTickFormatter, type xAxisMode } from './x-axis-formatter.utils';
 
 @Component({
   selector: 'app-graph',
@@ -23,7 +27,7 @@ import { DataSourceService } from './graph-data.service';
   templateUrl: './graph.component.html',
   providers: [DataSourceService],
   styleUrls: ['./graph.component.css'],
-  imports: [ResizeObserverDirective, JsonPipe, StartDataButtonComponent, DeviceListComponent],
+  imports: [ResizeObserverDirective, JsonPipe, StartDataButtonComponent, DeviceListComponent, MatSlideToggleModule],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GraphComponent {
@@ -62,8 +66,6 @@ export class GraphComponent {
     this.viewPort.updateGraphDimensions(dimension)
   }
 
-  // Axes related computations and
-
   marginTransform = computed(() => {
     return `translate(${this.dataservice.margin.left}, ${this.dataservice.margin.top})`
   })
@@ -88,12 +90,24 @@ export class GraphComponent {
     return `translate(${xScale.range()[0]}, 0)`;
   });
 
+  /**
+   * Signal to control the x-axis time mode. Relative starts with 0, absolute reflects the time of day the data was recorded.
+   */
+  readonly xAxisTimeMode = signal<xAxisMode>("absolute");
 
+  onXAxisTimeModeToggle(checked: boolean): void {
+    this.xAxisTimeMode.set(checked ? 'relative' : 'absolute');
+  }
   updateXAxisInCanvas = effect(() => {
     if (!this.isInBrowser) return;
-    const x = this.dataservice.xScale()
+    const x = this.dataservice.xScale();
+    const domain = x.domain();
+    const formatter = makeXAxisTickFormatter(this.xAxisTimeMode(), domain[0]);
     const g = this.axesContainer().nativeElement;
-    select(g).transition(transition()).duration(300).call(axisBottom(x));
+    select(g)
+      .transition(transition())
+      .duration(300)
+      .call(axisBottom(x).tickFormat(formatter));
   });
 
   updateYAxisInCanvas = effect(() => {

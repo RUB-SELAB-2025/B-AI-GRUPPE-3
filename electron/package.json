@@ -1,16 +1,9 @@
 {
-  "name": "OmnAIView",
+  "name": "OmnAIView_electron",
   "productName": "OmnAIView",
   "version": "0.2.0",
   "description": "OmnAIView electron App",
   "main": "dist/main.js",
-  "scripts": {
-    "start": "tsc && electron-forge start",
-    "package": "electron-forge package",
-    "make": "tsc && electron-forge make",
-    "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ."
-  },
   "keywords": [],
   "author": {
     "name": "Auto-Intern GmbH",
