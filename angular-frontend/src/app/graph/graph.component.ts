@@ -137,4 +137,9 @@ export class GraphComponent {
       test.clearData();
     }
   }
+  stopData() {
+    for (let test of this.dataSourceSelection.availableSources()) {
+      test.disconnect();
+    }
+  }
 }

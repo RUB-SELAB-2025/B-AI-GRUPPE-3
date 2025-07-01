@@ -15,6 +15,7 @@ export interface DataSource {
     connect(): unknown;
     data: Signal<Record<string, DataFormat[]>>
     clearData(): void;
+    disconnect(): unknown;
 }
 
 export class DataInfo {
@@ -83,6 +84,7 @@ export class DataSourceSelectionService {
             connect: this.liveDataService.connect.bind(this.liveDataService),
             data: this.liveDataService.data,
             clearData: this.liveDataService.clearData.bind(this.liveDataService),
+            disconnect: this.liveDataService.disconnect.bind(this.liveDataService),
         },
         {
             id: 'dummydata',
@@ -91,6 +93,7 @@ export class DataSourceSelectionService {
             connect: this.dummyDataService.connect.bind(this.dummyDataService),
             data: this.dummyDataService.data,
             clearData: this.dummyDataService.clearData.bind(this.dummyDataService),
+            disconnect: this.dummyDataService.disconnect.bind(this.dummyDataService),
         },
         {
             id: 'dummydatax2',
@@ -99,6 +102,7 @@ export class DataSourceSelectionService {
             connect: this.dummyDataServicex2.connect.bind(this.dummyDataServicex2),
             data: this.dummyDataServicex2.data,
             clearData: this.dummyDataServicex2.clearData.bind(this.dummyDataServicex2),
+            disconnect: this.dummyDataServicex2.disconnect.bind(this.dummyDataServicex2),
         },
         {
             id: 'csv-file',
@@ -107,6 +111,7 @@ export class DataSourceSelectionService {
             connect: this.csvDataService.connect.bind(this.csvDataService),
             data: this.csvDataService.data,
             clearData: this.csvDataService.clearData.bind(this.csvDataService),
+            disconnect: this.csvDataService.disconnect.bind(this.csvDataService),
         }
     ]);
     readonly availableSources = this._availableSources.asReadonly();

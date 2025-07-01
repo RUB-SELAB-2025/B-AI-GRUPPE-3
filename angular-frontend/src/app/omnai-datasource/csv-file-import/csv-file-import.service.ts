@@ -22,6 +22,7 @@ export class CsvFileImportService implements DataSource {
   connect() {
     this.dialog.open(CsvFileSelectModalComponent)
   }
+  disconnect(){}
   private readonly $data = signal<Record<string, DataFormat[]>>({});
   readonly data = this.$data.asReadonly();
 
