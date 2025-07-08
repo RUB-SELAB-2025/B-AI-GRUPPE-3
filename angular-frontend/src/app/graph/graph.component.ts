@@ -56,10 +56,9 @@ export class GraphComponent {
     const svg = select('svg');
     let mousePositions = [];
 
+    // Mausbewegung tracken, da "keydown" dies nicht ermöglicht
+
     let lastMousePosition: [number, number] = [0, 0];
-
-    // Mausbewegung tracken
-
     window.addEventListener("mousemove", (event) => {
       if (event.movementX || event.movementY){
         lastMousePosition = pointer(event, svg.node());
@@ -71,6 +70,9 @@ export class GraphComponent {
       lastMousePosition = pointer(event, svg.node());
     });*/
     
+
+    //Taste "m" speichert die aktuelle Position der Maus --> Kann später für Marker benutzt werden
+
     window.addEventListener("keydown", (event) => {
       if (event.key === "m" || event.key === "M") {
         //const [x, y] = pointer(event, svg.node());
@@ -79,6 +81,13 @@ export class GraphComponent {
         console.log("Registered:", mousePositions[mousePositions.length-1]);
         console.log("x: ", mousePositions[mousePositions.length-1][0], ", y: ", mousePositions[mousePositions.length-1][1]);
         //console.log(pointer(event, svg.node()));
+
+        /*let placeholder1 = 30;
+        let placeholder2 = 500;
+
+        svg.append('line').attr('x1', mousePositions[mousePositions.length-1][0]).attr('y1', placeholder1)
+        .attr('x2', mousePositions[mousePositions.length-1][0]).attr('y2', placeholder2)
+        .attr('stroke', 'steelblue').attr('stroke-width', 2);*/
       }
     });
 
