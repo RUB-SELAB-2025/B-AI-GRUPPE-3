@@ -54,20 +54,32 @@ export class GraphComponent {
       });
     }
     const svg = select('svg');
-    let mousePositions = [];/*
+    let mousePositions = [];
+    
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "m" || event.key === "M") {
+        const [x, y] = pointer(event, svg.node());
+        mousePositions.push([x, y]);
+        console.log("Registered:", mousePositions[mousePositions.length-1]);
+        console.log("x: ", mousePositions[mousePositions.length-1][0], ", y: ", mousePositions[mousePositions.length-1][1]);
+      }
+    });
+
+    /*
     this.svgGraph().nativeElement.addEventListener("keydown", function(event){
         console.log("testg");
         if(event.key === "m" || event.key === "M"){
             mousePositions.push(pointer(event)[0], pointer(event)[1]);
             console.log("Registered: ", mousePositions[mousePositions.length-1]);
         }
-    });*/
+    });
     select(this.svgGraph().nativeElement).on("keydown", function(event){
         if(event.key === "m" || event.key === "M"){
             mousePositions.push(pointer(event)[0], pointer(event)[1]);
             console.log("Registered: ", mousePositions[mousePositions.length-1]);
         }
-    })
+    })*/
+   
 
   }
 
