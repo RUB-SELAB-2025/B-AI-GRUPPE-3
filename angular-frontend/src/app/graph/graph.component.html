@@ -1,4 +1,4 @@
-<svg #graphContainer1 appResizeObserver (resize)="updateGraph1Dimensions($event)">
+<svg #graphContainer1 class="graph-big" appResizeObserver (resize)="updateGraph1Dimensions($event)">
   <g [attr.transform]="marginTransform()">
 
     <g #xAxis1 [attr.transform]="xAxis1TransformString()">
@@ -10,7 +10,7 @@
     }
   </g>
 </svg>
-<svg #graphContainer appResizeObserver (resize)="updateGraphDimensions($event)">
+<svg #graphContainer class="graph-small" appResizeObserver (resize)="updateGraphDimensions($event)">
     <g [attr.transform]="marginTransform()">
 
         <g #xAxis [attr.transform]="xAxisTransformString()">
