@@ -1,3 +1,12 @@
+.graph-big {
+  height: 55%;
+}
+
+.graph-small {
+  min-height: 100px;
+  height: 30%;
+}
+
 svg {
     min-width: 400px;
     min-height: 300px;
