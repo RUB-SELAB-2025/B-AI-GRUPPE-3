@@ -8,6 +8,9 @@ svg {
     box-sizing: border-box;
 }
 
-button{
-    padding-left: 10px;
+#border{
+    display: flex;
+    align-items: center;
+    padding-left: 5px;
+    padding-right: 5px;
 }

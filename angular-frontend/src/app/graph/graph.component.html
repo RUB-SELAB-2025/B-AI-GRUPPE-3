@@ -22,17 +22,25 @@
         }
     </g>
 </svg>
-<app-start-data-button />
-<button mat-button color="warn" (click)="clearData()">Clear Data</button>
-@if (this.stopped) {
-  <button mat-button color="warn" (click)="toggleData()">Start Data</button>
-} @else {
-  <button mat-button color="warn" (click)="toggleData()">Stop Data</button>
-}
-<app-device-list />
-<mat-slide-toggle [checked]="xAxisTimeMode() === 'relative'" (change)="onXAxisTimeModeToggle($event.checked)">
-  Relative Time
-</mat-slide-toggle>
+
+<div id="border">
+    <app-start-data-button />
+    <button mat-button color="primary" (click)="clearData() ">Clear Data</button>
+    @if (this.stopped) {
+    <button class="pause-play" mat-icon-button color="primary" (click)="toggleData()">
+        <mat-icon style="color: green;">play_arrow</mat-icon>
+    </button>
+    } @else {
+    <button class="pause-play" mat-icon-button color="warn" (click)="toggleData()">
+        <mat-icon style="color: red;">pause</mat-icon>
+    </button>
+    }
+    <mat-checkbox (change)="onXAxisTimeModeToggle($event.checked)">
+        Relative Time
+    </mat-checkbox>
+    <br>
+    <app-device-list />
+</div>
 
 <div> <!-- style="display: none;"-->
     <h4>Debug Output</h4>
