@@ -55,13 +55,30 @@ export class GraphComponent {
     }
     const svg = select('svg');
     let mousePositions = [];
+
+    let lastMousePosition: [number, number] = [0, 0];
+
+    // Mausbewegung tracken
+
+    window.addEventListener("mousemove", (event) => {
+      if (event.movementX || event.movementY){
+        lastMousePosition = pointer(event, svg.node());
+      }
+    });
+
+    /*
+    svg.on("mousemove", function(event) {
+      lastMousePosition = pointer(event, svg.node());
+    });*/
     
     window.addEventListener("keydown", (event) => {
       if (event.key === "m" || event.key === "M") {
-        const [x, y] = pointer(event, svg.node());
-        mousePositions.push([x, y]);
+        //const [x, y] = pointer(event, svg.node());
+        //mousePositions.push([x, y]);
+        mousePositions.push(lastMousePosition);
         console.log("Registered:", mousePositions[mousePositions.length-1]);
         console.log("x: ", mousePositions[mousePositions.length-1][0], ", y: ", mousePositions[mousePositions.length-1][1]);
+        //console.log(pointer(event, svg.node()));
       }
     });
 
