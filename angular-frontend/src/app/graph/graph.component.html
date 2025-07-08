@@ -23,11 +23,11 @@
     </g>
 </svg>
 <app-start-data-button />
-<button (click)="clearData()">Clear Data</button>
+<button mat-button color="warn" (click)="clearData()">Clear Data</button>
 @if (this.stopped) {
-  <button (click)="toggleData()">Start Data</button>
+  <button mat-button color="warn" (click)="toggleData()">Start Data</button>
 } @else {
-  <button (click)="toggleData()">Stop Data</button>
+  <button mat-button color="warn" (click)="toggleData()">Stop Data</button>
 }
 <app-device-list />
 <mat-slide-toggle [checked]="xAxisTimeMode() === 'relative'" (change)="onXAxisTimeModeToggle($event.checked)">
