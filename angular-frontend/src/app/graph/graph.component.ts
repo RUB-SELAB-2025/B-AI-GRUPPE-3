@@ -121,9 +121,14 @@ export class GraphComponent {
 
   updateXAxis1InCanvas = effect(() => {
     if (!this.isInBrowser) return;
-    const x = this.viewPort.xScale()
+    const x = this.dataservice.xScale();
+    const domain = x.domain();
+    const formatter = makeXAxisTickFormatter(this.xAxisTimeMode(), domain[0]);
     const g = this.axesContainer1().nativeElement;
-    select(g).transition(transition()).duration(300).call(axisBottom(x));
+    select(g)
+      .transition(transition())
+      .duration(300)
+      .call(axisBottom(x).tickFormat(formatter));
   });
 
   updateYAxis1InCanvas = effect(() => {
