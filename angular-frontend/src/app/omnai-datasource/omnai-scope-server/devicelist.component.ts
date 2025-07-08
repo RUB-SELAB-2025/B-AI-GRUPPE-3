@@ -2,11 +2,13 @@
 
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { OmnAIScopeDataService } from './live-data.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+
 
 @Component({
     selector: 'app-device-list',
     templateUrl: './devicelist.component.html',
-    imports: [],
+    imports: [MatFormFieldModule],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DeviceListComponent {

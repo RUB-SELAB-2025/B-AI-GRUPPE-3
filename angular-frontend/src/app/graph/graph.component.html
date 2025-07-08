@@ -23,7 +23,7 @@
     </g>
 </svg>
 
-<div id="border">
+<div id="selection">
     <app-start-data-button />
     <button mat-button color="primary" (click)="clearData() ">Clear Data</button>
     @if (this.stopped) {
@@ -38,7 +38,6 @@
     <mat-checkbox (change)="onXAxisTimeModeToggle($event.checked)">
         Relative Time
     </mat-checkbox>
-    <br>
     <app-device-list />
 </div>
 

@@ -8,9 +8,14 @@ svg {
     box-sizing: border-box;
 }
 
-#border{
+#selection{
     display: flex;
     align-items: center;
     padding-left: 5px;
     padding-right: 5px;
+    gap: 20px;
+}
+
+app-device-list{
+    flex-basis: 100%;
 }
