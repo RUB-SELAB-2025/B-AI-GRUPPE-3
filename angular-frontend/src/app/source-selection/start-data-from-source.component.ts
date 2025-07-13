@@ -4,13 +4,14 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DataSourceSelectionService } from './data-source-selection.service';
 import { SourceSelectModalComponent } from './source-select-modal.component';
 import {GraphComponent} from '../graph/graph.component';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
     selector: 'app-start-data-button',
     standalone: true,
-    imports: [MatDialogModule],
+    imports: [MatButtonModule, MatDialogModule],
     template: `
-    <button (click)="openModal()">Select Data</button>
+    <button mat-button (click)="openModal()" style="padding-left: 10px;">Select Data</button>
   `
 })
 export class StartDataButtonComponent {

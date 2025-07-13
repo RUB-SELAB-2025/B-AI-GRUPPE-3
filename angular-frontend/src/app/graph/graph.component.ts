@@ -21,6 +21,9 @@ import { StartDataButtonComponent } from "../source-selection/start-data-from-so
 import { DataSourceService } from './graph-data.service';
 import { makeXAxisTickFormatter, type xAxisMode } from './x-axis-formatter.utils';
 import {DataSource, DataSourceSelectionService} from '../source-selection/data-source-selection.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-graph',
@@ -28,7 +31,7 @@ import {DataSource, DataSourceSelectionService} from '../source-selection/data-s
   templateUrl: './graph.component.html',
   providers: [DataSourceService],
   styleUrls: ['./graph.component.css'],
-  imports: [ResizeObserverDirective, JsonPipe, StartDataButtonComponent, DeviceListComponent, MatSlideToggleModule],
+  imports: [MatCheckboxModule, MatIconModule, MatButtonModule, ResizeObserverDirective, JsonPipe, StartDataButtonComponent, DeviceListComponent, MatSlideToggleModule],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GraphComponent {
