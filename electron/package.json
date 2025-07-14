@@ -1,7 +1,7 @@
 {
   "name": "OmnAIView_electron",
   "productName": "OmnAIView",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "OmnAIView electron App",
   "main": "dist/main.js",
   "keywords": [],

@@ -37,6 +37,8 @@ Formatting needs to be similar to the dataformat of the old OmnAIView data expor
 - Secure reloading of entrypoint via did-fail-load Event in Electron (#100)
 - Add issue template (#89)
 - Update contribution workflow (#89)
+- Add darkmode via button toggle (#121)
+- Add workshop/advanced mode for car repair shops (#118)
 
 
 ### Changed 

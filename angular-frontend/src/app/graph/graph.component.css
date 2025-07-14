@@ -7,3 +7,10 @@ svg {
     display: block;
     box-sizing: border-box;
 }
+
+.button-wrapper {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    height: 50px;
+}
