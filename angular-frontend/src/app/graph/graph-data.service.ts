@@ -31,7 +31,7 @@ interface AdjustableWindow {
   end?: number;
 }
 
-type WindowDataAdjust = FixedWindow | AdjustableWindow;
+export type WindowDataAdjust = FixedWindow | AdjustableWindow;
 
 
 /**
@@ -108,11 +108,12 @@ export class DataSourceService {
       }
       //Otherwise filter according to the given description
       else {
-       for (const [key, value] of Object.entries(data)) {
-         newData[key] = value.filter(v=>
-           v.timestamp < (range.end ?? Number.POSITIVE_INFINITY) &&
-             v.timestamp > (range.start ?? Number.NEGATIVE_INFINITY)
-         )
+        for (const [key, value] of Object.entries(data)) {
+           newData[key] = value.filter(v=>
+             v.timestamp <= (range.end ?? Number.POSITIVE_INFINITY) &&
+               v.timestamp >= (range.start ?? Number.NEGATIVE_INFINITY)
+           )
+         // newData[key] = value
        }
       }
     } else if (range.type === 'fixed') {
@@ -181,9 +182,10 @@ export class DataSourceService {
     return dataMap;
   })
   readonly delaunay = computed(()=>{
+    let dataArray = this.dataArray();
     let xScale = this.xScale();
     let yScale = this.yScale();
-    return Delaunay.from(this.dataArray(), d => xScale(d.value.timestamp), d => yScale(d.value.value))
+    return Delaunay.from(dataArray, d => xScale(d.value.timestamp), d => yScale(d.value.value))
   });
 
   updateGraphDimensions(settings: { width: number; height: number }) {
@@ -261,7 +263,8 @@ export class DataSourceService {
           time: new Date(timestamp),
           value
         }));
-        const parsedColorArray = points.map((p) => p.color ?? {r: 72, g: 201, b: 176});  // 72, 201, 176  Parse color value separately so it doesn't interfere with lineGen(), if there's no color value use teal
+        let parsedColorArray = points.map((p) => p.color ?? {r: 72, g: 201, b: 176});  // 72, 201, 176  Parse color value separately so it doesn't interfere with lineGen(), if there's no color value use teal
+        if (parsedColorArray.length == 0) parsedColorArray = [{r: 72, g: 201, b: 176}];
         const rgbColorString: string = d3RGB(parsedColorArray[0].r, parsedColorArray[0].g, parsedColorArray[0].b).clamp().toString();  // Parses RGB color value with d3 method, clamp() cleans the RGB values to be between 0...255, returns string useable by html
         const pathData = lineGen(parsedValues) ?? '';  // Generated SVG path
         return { // Data which is available in graph.component.html

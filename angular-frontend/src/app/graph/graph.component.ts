@@ -18,7 +18,7 @@ import { timeFormat } from 'd3-time-format';
 import { DeviceListComponent } from "../omnai-datasource/omnai-scope-server/devicelist.component";
 import { ResizeObserverDirective } from '../shared/resize-observer.directive';
 import { StartDataButtonComponent } from "../source-selection/start-data-from-source.component";
-import { DataSourceService } from './graph-data.service';
+import {DataSourceService, WindowDataAdjust} from './graph-data.service';
 import { makeXAxisTickFormatter, type xAxisMode } from './x-axis-formatter.utils';
 import {DataSource, DataSourceSelectionService} from '../source-selection/data-source-selection.service';
 import { MatButtonModule } from '@angular/material/button';
@@ -67,10 +67,9 @@ export class GraphComponent {
     ) {
       let x  = lastMousePosition.x-data1_rect.left
       let y  = lastMousePosition.y-data1_rect.top
-      console.log("top: x: ", x, ", y: ", y);
       let index = this.viewPort.delaunay().find(x, y);
       let datapoint = this.viewPort.dataArray()[index];
-       return {type: "top", datapoint}
+      return {type: "top", datapoint}
     }
     else if (
       lastMousePosition.x-data2_rect.left > 0 &&
@@ -80,12 +79,11 @@ export class GraphComponent {
     ) {
       let x  = lastMousePosition.x-data2_rect.left
       let y  = lastMousePosition.y-data2_rect.top
-      console.log("bottom: x: ", x, ", y: ", y);
       let index = this.dataservice.delaunay().find(x, y);
-      let datapoint = this.viewPort.dataArray()[index];
-       return {type: "bottom", datapoint}
+      let datapoint = this.dataservice.dataArray()[index];
+      return {type: "bottom", datapoint}
     } else {
-       return null
+      return null
       //not in top or bottom graph
     }
   })
@@ -101,7 +99,26 @@ export class GraphComponent {
         this.lastMousePosition.set({x: pos[0], y: pos[1]});
       }
     });
-
+    this.svgGraph().nativeElement.addEventListener("click", (event) => {
+      let primary = (event.buttons^1) == 1;
+      let secondary = primary && event.altKey;
+      primary = primary && !event.altKey
+      if (!primary && !secondary) return;
+      let hovered_datapoint = this.hovered_datapoint();
+      if (typeof hovered_datapoint == "undefined" || hovered_datapoint == null || hovered_datapoint.type != "bottom") return;
+      if (typeof hovered_datapoint.datapoint == "undefined" || hovered_datapoint.datapoint == null) return;
+      this.viewPort.range.update(old=> {
+        let newValue: WindowDataAdjust = {type: "adjustable"};
+        if (old.type == "adjustable") newValue = old;
+        if (primary) newValue.start = hovered_datapoint.datapoint.value.timestamp;
+        if (secondary) newValue.end = hovered_datapoint.datapoint.value.timestamp;
+        return newValue;
+      })
+      if (primary||secondary) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+    })
     //Taste "m" speichert die aktuelle Position der Maus --> Kann später für Marker benutzt werden
 /*
     window.addEventListener("keydown", (event) => {
