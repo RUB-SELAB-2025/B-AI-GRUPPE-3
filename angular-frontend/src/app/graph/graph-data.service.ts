@@ -145,8 +145,6 @@ export class DataSourceService {
     let range = this.range();
     if (range.type == 'fixed') {
       let info = this.info();
-      console.log((info.maxTimestamp - info.minTimestamp))
-      console.log((info.maxTimestamp - info.minTimestamp) / range.width)
       return Math.max((info.maxTimestamp - info.minTimestamp) / range.width, 1) * dimension.width;
     } else {
       return dimension.width;

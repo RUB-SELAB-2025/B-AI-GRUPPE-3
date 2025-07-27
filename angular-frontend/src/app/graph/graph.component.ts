@@ -45,7 +45,6 @@ export class GraphComponent {
   readonly svgGraph1 = viewChild.required<ElementRef<SVGElement>>('graphContainer1');
   readonly svgGraph1_data = viewChild.required<ElementRef<SVGElement>>('graphContainer1_1');
   readonly scrollFollow = signal(false);
-  private oldWidth = 0;
   readonly axesContainer1 = viewChild.required<ElementRef<SVGGElement>>('xAxis1');
   readonly axesYContainer1 = viewChild.required<ElementRef<SVGGElement>>('yAxis1');
 
@@ -191,12 +190,7 @@ export class GraphComponent {
       .duration(300)
       .call(axisBottom(x).tickFormat(formatter));
     if (this.scrollFollow()){
-      let newWidth = this.widthBig();
-      if (this.oldWidth <= 0){
-        this.oldWidth = newWidth;
-        this.svgGraph1_data().nativeElement.scrollLeft = newWidth;
-      }
-      this.svgGraph1_data().nativeElement.scrollLeft += Math.abs(newWidth - this.oldWidth);
+      this.svgGraph1_data().nativeElement.scrollLeft = this.widthBig();
     }
   });
 
@@ -213,10 +207,7 @@ export class GraphComponent {
   }
   public stopped = false;
   toggleFollowData() {
-    this.scrollFollow.update(value => {
-      if(!value) this.oldWidth = this.widthBig();
-      return !value;
-    })
+    this.scrollFollow.update(value => !value)
   }
   toggleData() {
     if (this.stopped) {
