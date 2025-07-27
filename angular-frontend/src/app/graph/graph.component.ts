@@ -43,7 +43,8 @@ export class GraphComponent {
 
   readonly viewPort = new DataSourceService();
   readonly svgGraph1 = viewChild.required<ElementRef<SVGElement>>('graphContainer1');
-  readonly svgGraph1_data = viewChild.required<ElementRef<SVGElement>>('graphContainer1_1');
+  readonly svgGraph1_scroll = viewChild.required<ElementRef<SVGElement>>('graphContainer1_1');
+  readonly svgGraph1_data = viewChild.required<ElementRef<SVGElement>>('graphContainer1_1data');
   readonly scrollFollow = signal(false);
   readonly axesContainer1 = viewChild.required<ElementRef<SVGGElement>>('xAxis1');
   readonly axesYContainer1 = viewChild.required<ElementRef<SVGGElement>>('yAxis1');
@@ -51,6 +52,70 @@ export class GraphComponent {
   private readonly platform = inject(PLATFORM_ID);
   isInBrowser = isPlatformBrowser(this.platform);
 
+  lastMousePosition = signal({x: 0, y: 0});
+  hovered_datapoint = computed(()=> {
+    let lastMousePosition = this.lastMousePosition();
+    let svgGraph1_data = this.svgGraph1_data();
+    let svgGraph = this.svgGraph();
+    let data1_rect = svgGraph1_data.nativeElement.getBoundingClientRect();
+    let data2_rect = svgGraph.nativeElement.getBoundingClientRect();
+    if (
+      lastMousePosition.x-data1_rect.left > 0 &&
+      data1_rect.right - lastMousePosition.x > 0 &&
+      lastMousePosition.y-data1_rect.top > 0 &&
+      data1_rect.bottom - lastMousePosition.y > 0
+    ) {
+      let x  = lastMousePosition.x-data1_rect.left
+      let y  = lastMousePosition.y-data1_rect.top
+      console.log("top: x: ", x, ", y: ", y);
+      let index = this.viewPort.delaunay().find(x, y);
+      let datapoint = this.viewPort.dataArray()[index];
+       return {type: "top", datapoint}
+    }
+    else if (
+      lastMousePosition.x-data2_rect.left > 0 &&
+      data2_rect.right - lastMousePosition.x > 0 &&
+      lastMousePosition.y-data2_rect.top > 0 &&
+      data2_rect.bottom - lastMousePosition.y > 0
+    ) {
+      let x  = lastMousePosition.x-data2_rect.left
+      let y  = lastMousePosition.y-data2_rect.top
+      console.log("bottom: x: ", x, ", y: ", y);
+      let index = this.dataservice.delaunay().find(x, y);
+      let datapoint = this.viewPort.dataArray()[index];
+       return {type: "bottom", datapoint}
+    } else {
+       return null
+      //not in top or bottom graph
+    }
+  })
+
+  ngOnInit() {
+    let lastUpdate = performance.now();
+    window.addEventListener("mousemove", (event) => {
+      if (event.movementX || event.movementY) {
+        let currentUpdate = performance.now();
+        if (Math.abs(currentUpdate - lastUpdate) < 250) return;
+        lastUpdate = currentUpdate;
+        let pos = pointer(event);
+        this.lastMousePosition.set({x: pos[0], y: pos[1]});
+      }
+    });
+
+    //Taste "m" speichert die aktuelle Position der Maus --> Kann später für Marker benutzt werden
+/*
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "m" || event.key === "M") {
+        //const [x, y] = pointer(event, svg.node());
+        //mousePositions.push([x, y]);
+        let lastMousePosition = this.lastMousePosition();
+        mousePositions.push(lastMousePosition);
+        console.log("Registered:", lastMousePosition);
+        console.log("x: ", lastMousePosition.x, ", y: ", lastMousePosition.y);
+      }
+    });
+ */
+  }
   constructor() {
     this.dataservice.range.set({type: 'adjustable'});
     if(this.isInBrowser){
@@ -64,61 +129,66 @@ export class GraphComponent {
           this.viewPort.updateGraphDimensions({ width: rect1.width, height: rect1.height });
       });
     }
-    const svg = select('svg');
-    let mousePositions = [];
-
-    // Mausbewegung tracken, da "keydown" dies nicht ermöglicht
-
-    let lastMousePosition: [number, number] = [0, 0];
-    window.addEventListener("mousemove", (event) => {
-      if (event.movementX || event.movementY){
-        lastMousePosition = pointer(event, svg.node());
-      }
-    });
-
-    /*
-    svg.on("mousemove", function(event) {
-      lastMousePosition = pointer(event, svg.node());
-    });*/
-
-
-    //Taste "m" speichert die aktuelle Position der Maus --> Kann später für Marker benutzt werden
-
-    window.addEventListener("keydown", (event) => {
-      if (event.key === "m" || event.key === "M") {
-        //const [x, y] = pointer(event, svg.node());
-        //mousePositions.push([x, y]);
-        mousePositions.push(lastMousePosition);
-        console.log("Registered:", mousePositions[mousePositions.length-1]);
-        console.log("x: ", mousePositions[mousePositions.length-1][0], ", y: ", mousePositions[mousePositions.length-1][1]);
-        //console.log(pointer(event, svg.node()));
-
-        /*let placeholder1 = 30;
-        let placeholder2 = 500;
-
-        svg.append('line').attr('x1', mousePositions[mousePositions.length-1][0]).attr('y1', placeholder1)
-        .attr('x2', mousePositions[mousePositions.length-1][0]).attr('y2', placeholder2)
-        .attr('stroke', 'steelblue').attr('stroke-width', 2);*/
-      }
-    });
-
-    /*
-    this.svgGraph().nativeElement.addEventListener("keydown", function(event){
-        console.log("testg");
-        if(event.key === "m" || event.key === "M"){
-            mousePositions.push(pointer(event)[0], pointer(event)[1]);
-            console.log("Registered: ", mousePositions[mousePositions.length-1]);
-        }
-    });
-    select(this.svgGraph().nativeElement).on("keydown", function(event){
-        if(event.key === "m" || event.key === "M"){
-            mousePositions.push(pointer(event)[0], pointer(event)[1]);
-            console.log("Registered: ", mousePositions[mousePositions.length-1]);
-        }
-    })*/
-
-
   }
+  template_top_TransformString = computed(() => {
+    let hovered_datapoint = this.hovered_datapoint();
+    let xScale =this.viewPort.xScale();
+    let yScale =this.viewPort.yScale();
+    if (hovered_datapoint == null || hovered_datapoint.type != "top") return "translate(10000,10000)";
+    let datapoint = hovered_datapoint.datapoint;
+    if (typeof datapoint === "undefined") return "translate(10000,10000)";
+    return `translate(${xScale(datapoint.value.timestamp)}, ${yScale(datapoint.value.value)})`;
+  });
+  template_top_value = computed(() => {
+    let hovered_datapoint = this.hovered_datapoint();
+    if (hovered_datapoint == null || hovered_datapoint.type != "top") return "";
+    let datapoint = hovered_datapoint.datapoint;
+    if (typeof datapoint === "undefined") return "";
+    return datapoint.value.value.toString();
+  });
+  template_top_time = computed(() => {
+    let hovered_datapoint = this.hovered_datapoint();
+    if (hovered_datapoint == null || hovered_datapoint.type != "top") return "";
+    let datapoint = hovered_datapoint.datapoint;
+    if (typeof datapoint === "undefined") return "";
+    return new Date(datapoint.value.timestamp).toLocaleString();
+  });
+  template_top_id = computed(() => {
+    let hovered_datapoint = this.hovered_datapoint();
+    if (hovered_datapoint == null || hovered_datapoint.type != "top") return "";
+    let datapoint = hovered_datapoint.datapoint;
+    if (typeof datapoint === "undefined") return "";
+    return datapoint.key;
+  });
+
+  template_bottom_TransformString = computed(() => {
+    let hovered_datapoint = this.hovered_datapoint();
+    if (hovered_datapoint == null || hovered_datapoint.type != "bottom") return "translate(10000,10000)";
+    let datapoint = hovered_datapoint.datapoint;
+    if (typeof datapoint === "undefined") return "translate(10000,10000)";
+    return `translate(${this.dataservice.xScale()(datapoint.value.timestamp)}, ${this.dataservice.yScale()(datapoint.value.value)})`;
+  });
+  template_bottom_value = computed(() => {
+    let hovered_datapoint = this.hovered_datapoint();
+    if (hovered_datapoint == null || hovered_datapoint.type != "bottom") return "";
+    let datapoint = hovered_datapoint.datapoint;
+    if (typeof datapoint === "undefined") return "";
+    return datapoint.value.value.toString();
+  });
+  template_bottom_time = computed(() => {
+    let hovered_datapoint = this.hovered_datapoint();
+    if (hovered_datapoint == null || hovered_datapoint.type != "bottom") return "";
+    let datapoint = hovered_datapoint.datapoint;
+    if (typeof datapoint === "undefined") return "";
+    return new Date(datapoint.value.timestamp).toLocaleString();
+  });
+  template_bottom_id = computed(() => {
+    let hovered_datapoint = this.hovered_datapoint();
+    if (hovered_datapoint == null || hovered_datapoint.type != "bottom") return "";
+    let datapoint = hovered_datapoint.datapoint;
+    if (typeof datapoint === "undefined") return "";
+    return datapoint.key;
+  });
 
   updateGraphDimensions(dimension: { width: number, height: number }) {
     this.dataservice.updateGraphDimensions(dimension)
@@ -190,7 +260,7 @@ export class GraphComponent {
       .duration(300)
       .call(axisBottom(x).tickFormat(formatter));
     if (this.scrollFollow()){
-      this.svgGraph1_data().nativeElement.scrollLeft = this.widthBig();
+      this.svgGraph1_scroll().nativeElement.scrollLeft = this.widthBig();
     }
   });
 

@@ -5,19 +5,25 @@
     </g>
   </svg>
   <div #graphContainer1_1 style="overflow-x: scroll;height: 100%;">
-    <svg style="height: 100%; width: unset; min-width: unset;" [attr.width]="widthBig()" >
+    <svg #graphContainer1_1data style="height: 100%; width: unset; min-width: unset;" [attr.width]="widthBig()" >
       <g [attr.transform]="marginTransform()">
         <g #xAxis1 [attr.transform]="xAxis1TransformString()"></g>
         @for (path of viewPort.paths(); track $index) {  <!--Copy of dataservice svg-->
           <path [attr.d]="path.d" fill="none" [attr.stroke]="path.color" stroke-width="2" />
         }
+        <g [attr.transform]="template_top_TransformString()">
+          <text x="0" y="0" dy="0" >
+            <tspan x="0" dy="0">Value: {{template_top_value()}}</tspan>
+            <tspan x="0" dy="1em">Time: {{template_top_time()}}</tspan>
+            <tspan x="0" dy="1em">Id: {{template_top_id()}}</tspan>
+          </text>
+        </g>
       </g>
     </svg>
   </div>
 </div>
 <svg #graphContainer class="graph-small" appResizeObserver (resize)="updateGraphDimensions($event)">
     <g [attr.transform]="marginTransform()">
-
         <g #xAxis [attr.transform]="xAxisTransformString()">
 
         </g>
@@ -25,6 +31,13 @@
         @for (path of dataservice.paths(); track $index) {
             <path [attr.d]="path.d" fill="none" [attr.stroke]="path.color" stroke-width="2" />  <!--Changed stroke, so it uses the color value in path-->
         }
+      <g [attr.transform]="template_bottom_TransformString()">
+        <text x="0" y="0" dy="0" >
+          <tspan x="0" dy="0">Value: {{template_bottom_value()}}</tspan>
+          <tspan x="0" dy="1em">Time: {{template_bottom_time()}}</tspan>
+          <tspan x="0" dy="1em">Id: {{template_bottom_id()}}</tspan>
+        </text>
+      </g>
     </g>
 </svg>
 

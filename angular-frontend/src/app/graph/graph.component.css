@@ -16,6 +16,11 @@ svg {
     display: block;
     box-sizing: border-box;
 }
+@media (prefers-color-scheme: dark) {
+  text {
+    fill: white;
+  }
+}
 
 #selection{
     display: flex;

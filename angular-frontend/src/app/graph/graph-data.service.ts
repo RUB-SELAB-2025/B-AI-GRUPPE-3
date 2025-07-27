@@ -6,7 +6,9 @@ import {DataFormat, OmnAIScopeDataService} from '../omnai-datasource/omnai-scope
 import { type GraphComponent } from './graph.component';
 import {DataInfo, DataSourceSelectionService} from '../source-selection/data-source-selection.service';
 import { color } from 'd3';
+import {Delaunay} from 'd3-delaunay';
 import * as domain from 'node:domain';
+import {sign} from 'node:crypto';
 
 
 type UnwrapSignal<T> = T extends import('@angular/core').Signal<infer U> ? U : never;
@@ -164,6 +166,24 @@ export class DataSourceService {
         .range([height, 0]);
 
     },
+  });
+  readonly dataArray = computed(()=>{
+    let data = this.data();
+    let dataMap = [];
+    let keys = Object.keys(data);
+    keys.sort();
+    for (const key of keys) {
+      let values = data[key];
+      for (const value of values) {
+        dataMap.push({key, value});
+      }
+    }
+    return dataMap;
+  })
+  readonly delaunay = computed(()=>{
+    let xScale = this.xScale();
+    let yScale = this.yScale();
+    return Delaunay.from(this.dataArray(), d => xScale(d.value.timestamp), d => yScale(d.value.value))
   });
 
   updateGraphDimensions(settings: { width: number; height: number }) {
