@@ -6,16 +6,24 @@ import {
   effect,
   inject,
   PLATFORM_ID,
+  signal,
   viewChild,
   type ElementRef
 } from '@angular/core';
-import { transition } from 'd3';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { NumberValue, transition } from 'd3';
 import { axisBottom, axisLeft } from 'd3-axis';
 import { pointer, select } from 'd3-selection';
+import { timeFormat } from 'd3-time-format';
 import { DeviceListComponent } from "../omnai-datasource/omnai-scope-server/devicelist.component";
 import { ResizeObserverDirective } from '../shared/resize-observer.directive';
 import { StartDataButtonComponent } from "../source-selection/start-data-from-source.component";
 import { DataSourceService } from './graph-data.service';
+import { makeXAxisTickFormatter, type xAxisMode } from './x-axis-formatter.utils';
+import {DataSource, DataSourceSelectionService} from '../source-selection/data-source-selection.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-graph',
@@ -23,10 +31,11 @@ import { DataSourceService } from './graph-data.service';
   templateUrl: './graph.component.html',
   providers: [DataSourceService],
   styleUrls: ['./graph.component.css'],
-  imports: [ResizeObserverDirective, JsonPipe, StartDataButtonComponent, DeviceListComponent],
+  imports: [MatCheckboxModule, MatIconModule, MatButtonModule, ResizeObserverDirective, JsonPipe, StartDataButtonComponent, DeviceListComponent, MatSlideToggleModule],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GraphComponent {
+  readonly dataSourceSelection = inject(DataSourceSelectionService);
   readonly dataservice = inject(DataSourceService);
   readonly svgGraph = viewChild.required<ElementRef<SVGElement>>('graphContainer');
   readonly axesContainer = viewChild.required<ElementRef<SVGGElement>>('xAxis');
@@ -34,6 +43,9 @@ export class GraphComponent {
 
   readonly viewPort = new DataSourceService();
   readonly svgGraph1 = viewChild.required<ElementRef<SVGElement>>('graphContainer1');
+  readonly svgGraph1_data = viewChild.required<ElementRef<SVGElement>>('graphContainer1_1');
+  readonly scrollFollow = signal(false);
+  private oldWidth = 0;
   readonly axesContainer1 = viewChild.required<ElementRef<SVGGElement>>('xAxis1');
   readonly axesYContainer1 = viewChild.required<ElementRef<SVGGElement>>('yAxis1');
 
@@ -69,7 +81,7 @@ export class GraphComponent {
     svg.on("mousemove", function(event) {
       lastMousePosition = pointer(event, svg.node());
     });*/
-    
+
 
     //Taste "m" speichert die aktuelle Position der Maus --> Kann später für Marker benutzt werden
 
@@ -105,7 +117,7 @@ export class GraphComponent {
             console.log("Registered: ", mousePositions[mousePositions.length-1]);
         }
     })*/
-   
+
 
   }
 
@@ -115,8 +127,6 @@ export class GraphComponent {
   updateGraph1Dimensions(dimension: { width: number, height: number }) {
     this.viewPort.updateGraphDimensions(dimension)
   }
-
-  // Axes related computations and
 
   marginTransform = computed(() => {
     return `translate(${this.dataservice.margin.left}, ${this.dataservice.margin.top})`
@@ -141,13 +151,26 @@ export class GraphComponent {
     const xScale = this.viewPort.xScale();
     return `translate(${xScale.range()[0]}, 0)`;
   });
+  widthBig = this.viewPort.width;
 
+  /**
+   * Signal to control the x-axis time mode. Relative starts with 0, absolute reflects the time of day the data was recorded.
+   */
+  readonly xAxisTimeMode = signal<xAxisMode>("absolute");
 
+  onXAxisTimeModeToggle(checked: boolean): void {
+    this.xAxisTimeMode.set(checked ? 'relative' : 'absolute');
+  }
   updateXAxisInCanvas = effect(() => {
     if (!this.isInBrowser) return;
-    const x = this.dataservice.xScale()
+    const x = this.dataservice.xScale();
+    const domain = x.domain();
+    const formatter = makeXAxisTickFormatter(this.xAxisTimeMode(), domain[0]);
     const g = this.axesContainer().nativeElement;
-    select(g).transition(transition()).duration(300).call(axisBottom(x));
+    select(g)
+      .transition(transition())
+      .duration(300)
+      .call(axisBottom(x).tickFormat(formatter));
   });
 
   updateYAxisInCanvas = effect(() => {
@@ -159,9 +182,22 @@ export class GraphComponent {
 
   updateXAxis1InCanvas = effect(() => {
     if (!this.isInBrowser) return;
-    const x = this.viewPort.xScale()
+    const x = this.viewPort.xScale();
+    const domain = x.domain();
+    const formatter = makeXAxisTickFormatter(this.xAxisTimeMode(), domain[0]);
     const g = this.axesContainer1().nativeElement;
-    select(g).transition(transition()).duration(300).call(axisBottom(x));
+    select(g)
+      .transition(transition())
+      .duration(300)
+      .call(axisBottom(x).tickFormat(formatter));
+    if (this.scrollFollow()){
+      let newWidth = this.widthBig();
+      if (this.oldWidth <= 0){
+        this.oldWidth = newWidth;
+        this.svgGraph1_data().nativeElement.scrollLeft = newWidth;
+      }
+      this.svgGraph1_data().nativeElement.scrollLeft += Math.abs(newWidth - this.oldWidth);
+    }
   });
 
   updateYAxis1InCanvas = effect(() => {
@@ -170,5 +206,28 @@ export class GraphComponent {
     const g = this.axesYContainer1().nativeElement;
     select(g).transition(transition()).duration(300).call(axisLeft(y));
   });
-
+  clearData() {
+    for (let test of this.dataSourceSelection.availableSources()) {
+      test.clearData();
+    }
+  }
+  public stopped = false;
+  toggleFollowData() {
+    this.scrollFollow.update(value => {
+      if(!value) this.oldWidth = this.widthBig();
+      return !value;
+    })
+  }
+  toggleData() {
+    if (this.stopped) {
+      for (let test of this.dataSourceSelection.currentSource()) {
+        test.connect();
+      }
+    } else {
+      for (let test of this.dataSourceSelection.availableSources()) {
+        test.disconnect();
+      }
+    }
+    this.stopped = !this.stopped;
+  }
 }

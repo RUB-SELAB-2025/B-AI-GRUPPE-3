@@ -1,0 +1,52 @@
+name: Build-Windows-Binary
+
+permissions:
+  actions: read
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  push:
+    branches:
+      - "**"
+    tags:
+      - '**'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: 20
+jobs:
+  Build-Windows:
+    runs-on: windows-latest
+    steps:
+      - name: Repository-Checkout
+        uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+      - name: Cache node_modules
+        id: cache-node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node_modules-${{ runner.os }}-${{runner.arch}}-node_${{ env.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}
+      - name: Install NPM-Dependencies
+        if: ${{steps.cache-node_modules.outputs.cache-hit != 'true'}}
+        run: npm ci --no-audit --no-fund
+      - name: Build Project
+        run: npm run build
+      - name: Test Angular
+        working-directory: angular-frontend
+        run: npx ng test --watch=false
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OmnaiView-Windows-${{ github.sha }}
+          path: |
+            electron\out\make\squirrel.windows\x64\RELEASES
+            electron\out\make\squirrel.windows\x64\*.nupkg
+            electron\out\make\squirrel.windows\x64\*.exe

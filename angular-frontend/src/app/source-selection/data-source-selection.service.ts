@@ -14,6 +14,8 @@ export interface DataPoint {
 export interface DataSource {
     connect(): unknown;
     data: Signal<Record<string, DataFormat[]>>
+    clearData(): void;
+    disconnect(): unknown;
 }
 
 export class DataInfo {
@@ -80,28 +82,36 @@ export class DataSourceSelectionService {
             name: 'OmnAIScope',
             description: 'Live data from connected OmnAIScope devices',
             connect: this.liveDataService.connect.bind(this.liveDataService),
-            data: this.liveDataService.data
+            data: this.liveDataService.data,
+            clearData: this.liveDataService.clearData.bind(this.liveDataService),
+            disconnect: this.liveDataService.disconnect.bind(this.liveDataService),
         },
         {
             id: 'dummydata',
             name: 'Random Dummy Data',
             description: 'Random generated data points',
             connect: this.dummyDataService.connect.bind(this.dummyDataService),
-            data: this.dummyDataService.data
+            data: this.dummyDataService.data,
+            clearData: this.dummyDataService.clearData.bind(this.dummyDataService),
+            disconnect: this.dummyDataService.disconnect.bind(this.dummyDataService),
         },
         {
             id: 'dummydatax2',
             name: 'Random Dummy Data x2',
             description: 'Random generated data points',
             connect: this.dummyDataServicex2.connect.bind(this.dummyDataServicex2),
-            data: this.dummyDataServicex2.data
+            data: this.dummyDataServicex2.data,
+            clearData: this.dummyDataServicex2.clearData.bind(this.dummyDataServicex2),
+            disconnect: this.dummyDataServicex2.disconnect.bind(this.dummyDataServicex2),
         },
         {
             id: 'csv-file',
             name: 'CSV Data',
             description: 'Import a CSV file',
             connect: this.csvDataService.connect.bind(this.csvDataService),
-            data: this.csvDataService.data
+            data: this.csvDataService.data,
+            clearData: this.csvDataService.clearData.bind(this.csvDataService),
+            disconnect: this.csvDataService.disconnect.bind(this.csvDataService),
         }
     ]);
     readonly availableSources = this._availableSources.asReadonly();

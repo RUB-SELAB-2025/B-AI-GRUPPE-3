@@ -3,9 +3,14 @@ import * as path from "path";
 import * as fs from 'fs';
 import { omnaiscopeBackendManager } from './omnaiBackend';
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) {
-  app.quit();
+try {
+  if (require('electron-squirrel-startup')) {
+    app.quit();
+  }
+} catch (err) {
+  console.log('electron-squirrel-startup not available:', err.message);
 }
+
 
 let mainWindow: BrowserWindow;
 

@@ -6,6 +6,7 @@ import {DataFormat, OmnAIScopeDataService} from '../omnai-datasource/omnai-scope
 import { type GraphComponent } from './graph.component';
 import {DataInfo, DataSourceSelectionService} from '../source-selection/data-source-selection.service';
 import { color } from 'd3';
+import * as domain from 'node:domain';
 
 
 type UnwrapSignal<T> = T extends import('@angular/core').Signal<infer U> ? U : never;
@@ -32,14 +33,23 @@ type WindowDataAdjust = FixedWindow | AdjustableWindow;
 
 
 /**
+ * Describes the potential Domain values for the x-axis
+ * */
+type xDomainType = Date;
+type xDomainTuple = [xDomainType, xDomainType];
+
+const defaultXDomain: xDomainTuple = [new Date(), new Date(Date.now() - 24 * 60 * 60 * 1000)];
+
+/**
  * Provide the data to be displayed in the {@link GraphComponent}
- */
-@Injectable({
-  providedIn: 'root',
-})
+ * This class also provides the axis descriptions. As these are dependend on the size of the current
+ * graph, this service needs to be provided in any component that creates a graph to ensure that
+ * every graph has its own state management.
+ *  */
+@Injectable()
 export class DataSourceService {
   private readonly $graphDimensions = signal({width: 800, height: 600});
-  private readonly $xDomain = signal([new Date(2020), new Date()]);
+  private readonly $xDomain = signal<xDomainTuple>(defaultXDomain);
   private readonly $yDomain = signal([0, 100]);
   private readonly dataSourceSelectionService = inject(DataSourceSelectionService);
 
@@ -69,7 +79,7 @@ export class DataSourceService {
     //Apply range info onto that Data Info
     const range = this.range();
     if (range.type == 'fixed') {
-      info.minTimestamp = info.maxTimestamp - range.width;
+      // info.minTimestamp = info.maxTimestamp - range.width;
     } else if (range.type == 'adjustable') {
       if (range.end) info.maxTimestamp = range.end;
       if (range.start) info.minTimestamp = range.start;
@@ -107,7 +117,8 @@ export class DataSourceService {
       const info = this.info();
       //info will already have applied the range info. minTimestamp will therefore be the correct value.
       for (const [key, value] of Object.entries(data)) {
-        newData[key] = value.filter(v=> v.timestamp > info.minTimestamp)
+        // newData[key] = value.filter(v=> v.timestamp > info.minTimestamp)
+        newData[key] = value
       }
     }
 
@@ -121,12 +132,26 @@ export class DataSourceService {
     }),
     computation: ({dimensions, xDomain}) => {
       const margin = {top: 20, right: 30, bottom: 40, left: 40};
-      const width = dimensions.width - margin.left - margin.right;
+      const margin_width = dimensions.width - margin.left - margin.right;
+      const width = this.width();
       return d3ScaleUtc()
         .domain(xDomain)
-        .range([0, width]);
+        .range([0, width+margin_width]);
     },
   });
+
+  public width = computed(()=>{
+    let dimension = this.$graphDimensions();
+    let range = this.range();
+    if (range.type == 'fixed') {
+      let info = this.info();
+      console.log((info.maxTimestamp - info.minTimestamp))
+      console.log((info.maxTimestamp - info.minTimestamp) / range.width)
+      return Math.max((info.maxTimestamp - info.minTimestamp) / range.width, 1) * dimension.width;
+    } else {
+      return dimension.width;
+    }
+  })
 
   yScale = linkedSignal({
     source: () => ({
@@ -139,6 +164,7 @@ export class DataSourceService {
       return d3ScaleLinear()
         .domain(yDomain)
         .range([height, 0]);
+
     },
   });
 
@@ -180,14 +206,17 @@ export class DataSourceService {
     }), initial);
 
     if (!isFinite(result.minTimestamp) || !isFinite(result.minValue)) return;
-
     const xDomainRange = result.maxTimestamp - result.minTimestamp;
     const xExpansion = xDomainRange * expandBy;
-
-    this.$xDomain.set([
-      new Date(result.minTimestamp - xExpansion),
-      new Date(result.maxTimestamp + xExpansion),
-    ]);
+    if (xDomainRange === 0) {
+      this.$xDomain.set(defaultXDomain);
+    }
+    else {
+      this.$xDomain.set([
+        new Date(result.minTimestamp),
+        new Date(result.maxTimestamp)
+      ]);
+    }
 
     const yDomainRange = result.maxValue - result.minValue;
     const yExpansion = yDomainRange * expandBy;
@@ -214,9 +243,9 @@ export class DataSourceService {
           time: new Date(timestamp),
           value
         }));
-        const parsedColorArray = points.map((p) => p.color ?? {r: 0, g: 0, b: 255});  // Parse color value separately so it doesn't interfere with lineGen()
-        const rgbColorString: string = d3RGB(parsedColorArray[0].r, parsedColorArray[0].g, parsedColorArray[0].b).clamp().toString();  // clamp() cleans the RGB values to be between 0...255
-        const pathData = lineGen(parsedValues) ?? '';
+        const parsedColorArray = points.map((p) => p.color ?? {r: 72, g: 201, b: 176});  // 72, 201, 176  Parse color value separately so it doesn't interfere with lineGen(), if there's no color value use teal
+        const rgbColorString: string = d3RGB(parsedColorArray[0].r, parsedColorArray[0].g, parsedColorArray[0].b).clamp().toString();  // Parses RGB color value with d3 method, clamp() cleans the RGB values to be between 0...255, returns string useable by html
+        const pathData = lineGen(parsedValues) ?? '';  // Generated SVG path
         return { // Data which is available in graph.component.html
           id: key,
           d: pathData,
@@ -225,5 +254,4 @@ export class DataSourceService {
         });
     },
   });
-
 }

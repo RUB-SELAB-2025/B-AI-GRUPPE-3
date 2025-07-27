@@ -1,16 +1,23 @@
 {
   "name": "omnaiview-parent",
   "version": "0.2.0",
-  "description": "Modulares Frontend zur Anzeige und Analyse von Zeitreihendaten",
+  "description": "Frontend for time-series data receiving, visualising and analysing",
+  "private": true,
+  "workspaces": ["angular-frontend", "electron"],
   "scripts": {
-    "postinstall": "npm run install:all",
-    "install:all": "npm run install:angular && npm run install:electron",
-    "install:angular": "cd angular-frontend && npm ci",
-    "install:electron": "cd electron && npm ci",
-    "build": "npm run build:angular && npm run build:electron",
-    "build:angular": "cd angular-frontend && npm run build",
-    "build:electron": "cd electron && npm run make",
-    "start:dev": "cd angular-frontend && npm run start",
-    "start:electron": "cd electron && npm run start"
+    "prepare":                  "node version-information.js",
+    "start:angular":            "npm exec -w angular-frontend ng serve",
+    "build:angular":            "npm run prepare && npm exec -w angular-frontend ng build",
+    "watch:angular":            "npm exec -w angular-frontend ng build --watch --configuration development",
+    "test:angular":             "npm exec -w angular-frontend ng test",
+    "compodoc:build":           "npm exec -w angular-frontend compodoc -p tsconfig.doc.json",
+    "compodoc:build-and-serve": "npm exec -w angular-frontend compodoc -p tsconfig.doc.json -s",
+    "compodoc:serve":           "npm exec -w angular-frontend compodoc -s",
+    "serve:ssr":                "node electron/res/angular/server/server.mjs",
+    "start:electron":           "npm exec -w electron tsc && npm exec -w electron electron-forge start",
+    "build:electron":           "npm run prepare && npm exec -w electron tsc && npm exec -w electron electron-forge make",
+    "package:electron":         "npm exec -w electron electron-forge package",
+    "publish:electron":         "npm exec -w electron electron-forge publish",
+    "build":                    "npm run prepare && npm run build:angular && npm run build:electron"
   }
 }
