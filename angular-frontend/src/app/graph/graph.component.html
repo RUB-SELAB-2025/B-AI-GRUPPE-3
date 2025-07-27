@@ -38,6 +38,36 @@
           <tspan x="0" dy="1em">Id: {{template_bottom_id()}}</tspan>
         </text>
       </g>
+      @if (marker_xleft() != null){
+        <line
+          [attr.x1]="marker_xleft()"
+          [attr.x2]="marker_xleft()"
+          [attr.y1]="marker_ymin()"
+          [attr.y2]="marker_ymax()"
+        />
+        <text
+          [attr.y]="marker_ymax()"
+          [attr.x]="marker_xleft()"
+          text-anchor="middle"
+        >
+          Start
+        </text>
+              }
+      @if (marker_xright() != null){
+        <line
+          [attr.x1]="marker_xright()"
+          [attr.x2]="marker_xright()"
+          [attr.y1]="marker_ymin()"
+          [attr.y2]="marker_ymax()"
+        />
+        <text
+          [attr.y]="marker_ymax()"
+          [attr.x]="marker_xright()"
+          text-anchor="middle"
+        >
+          End
+        </text>
+      }
     </g>
 </svg>
 

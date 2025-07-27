@@ -99,10 +99,27 @@ export class GraphComponent {
         this.lastMousePosition.set({x: pos[0], y: pos[1]});
       }
     });
+    //Taste "m" speichert die aktuelle Position der Maus --> Kann später für Marker benutzt werden
+/*
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "m" || event.key === "M") {
+        //const [x, y] = pointer(event, svg.node());
+        //mousePositions.push([x, y]);
+        let lastMousePosition = this.lastMousePosition();
+        mousePositions.push(lastMousePosition);
+        console.log("Registered:", lastMousePosition);
+        console.log("x: ", lastMousePosition.x, ", y: ", lastMousePosition.y);
+      }
+    });
+ */
+  }
+  svgClick = effect(()=>{
+    console.log("init");
     this.svgGraph().nativeElement.addEventListener("click", (event) => {
       let primary = (event.buttons^1) == 1;
       let secondary = primary && event.altKey;
       primary = primary && !event.altKey
+      console.log("click")
       if (!primary && !secondary) return;
       let hovered_datapoint = this.hovered_datapoint();
       if (typeof hovered_datapoint == "undefined" || hovered_datapoint == null || hovered_datapoint.type != "bottom") return;
@@ -119,20 +136,7 @@ export class GraphComponent {
         event.stopPropagation()
       }
     })
-    //Taste "m" speichert die aktuelle Position der Maus --> Kann später für Marker benutzt werden
-/*
-    window.addEventListener("keydown", (event) => {
-      if (event.key === "m" || event.key === "M") {
-        //const [x, y] = pointer(event, svg.node());
-        //mousePositions.push([x, y]);
-        let lastMousePosition = this.lastMousePosition();
-        mousePositions.push(lastMousePosition);
-        console.log("Registered:", lastMousePosition);
-        console.log("x: ", lastMousePosition.x, ", y: ", lastMousePosition.y);
-      }
-    });
- */
-  }
+  });
   constructor() {
     this.dataservice.range.set({type: 'adjustable'});
     if(this.isInBrowser){
@@ -206,6 +210,37 @@ export class GraphComponent {
     if (typeof datapoint === "undefined") return "";
     return datapoint.key;
   });
+
+  marker_ymin = computed(() => {
+    const info = this.viewPort.info();
+    const yScale = this.dataservice.yScale();
+    const minY = yScale(info.minValue);
+    return minY;
+  })
+  marker_ymax = computed(() => {
+    const info = this.viewPort.info();
+    const yScale = this.dataservice.yScale();
+    const maxY = yScale(info.maxValue);
+    return maxY;
+  })
+  marker_xleft = computed(() => {
+    const range = this.viewPort.range();
+    if (range.type != "adjustable") return null;
+    const xScale = this.dataservice.xScale();
+    if (typeof range.start != "undefined"){
+      return xScale(range.start);
+    }
+    return null;
+  })
+  marker_xright = computed(() => {
+    const range = this.viewPort.range();
+    if (range.type != "adjustable") return null;
+    const xScale = this.dataservice.xScale();
+    if (typeof range.end != "undefined"){
+      return xScale(range.end);
+    }
+    return null;
+  })
 
   updateGraphDimensions(dimension: { width: number, height: number }) {
     this.dataservice.updateGraphDimensions(dimension)
