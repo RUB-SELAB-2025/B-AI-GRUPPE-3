@@ -6,6 +6,7 @@ import {DataFormat, OmnAIScopeDataService} from '../omnai-datasource/omnai-scope
 import { type GraphComponent } from './graph.component';
 import {DataInfo, DataSourceSelectionService} from '../source-selection/data-source-selection.service';
 import { color } from 'd3';
+import * as domain from 'node:domain';
 
 
 type UnwrapSignal<T> = T extends import('@angular/core').Signal<infer U> ? U : never;
@@ -78,7 +79,7 @@ export class DataSourceService {
     //Apply range info onto that Data Info
     const range = this.range();
     if (range.type == 'fixed') {
-      info.minTimestamp = info.maxTimestamp - range.width;
+      // info.minTimestamp = info.maxTimestamp - range.width;
     } else if (range.type == 'adjustable') {
       if (range.end) info.maxTimestamp = range.end;
       if (range.start) info.minTimestamp = range.start;
@@ -116,7 +117,8 @@ export class DataSourceService {
       const info = this.info();
       //info will already have applied the range info. minTimestamp will therefore be the correct value.
       for (const [key, value] of Object.entries(data)) {
-        newData[key] = value.filter(v=> v.timestamp > info.minTimestamp)
+        // newData[key] = value.filter(v=> v.timestamp > info.minTimestamp)
+        newData[key] = value
       }
     }
 
@@ -130,12 +132,26 @@ export class DataSourceService {
     }),
     computation: ({dimensions, xDomain}) => {
       const margin = {top: 20, right: 30, bottom: 40, left: 40};
-      const width = dimensions.width - margin.left - margin.right;
+      const margin_width = dimensions.width - margin.left - margin.right;
+      const width = this.width();
       return d3ScaleUtc()
         .domain(xDomain)
-        .range([0, width]);
+        .range([0, width+margin_width]);
     },
   });
+
+  public width = computed(()=>{
+    let dimension = this.$graphDimensions();
+    let range = this.range();
+    if (range.type == 'fixed') {
+      let info = this.info();
+      console.log((info.maxTimestamp - info.minTimestamp))
+      console.log((info.maxTimestamp - info.minTimestamp) / range.width)
+      return Math.max((info.maxTimestamp - info.minTimestamp) / range.width, 1) * dimension.width;
+    } else {
+      return dimension.width;
+    }
+  })
 
   yScale = linkedSignal({
     source: () => ({
