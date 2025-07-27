@@ -1,15 +1,20 @@
-<svg #graphContainer1 class="graph-big" appResizeObserver (resize)="updateGraph1Dimensions($event)">
-  <g [attr.transform]="marginTransform()">
-
-    <g #xAxis1 [attr.transform]="xAxis1TransformString()">
-
+<div class="graph-big" appResizeObserver (resize)="updateGraph1Dimensions($event)">
+  <svg #graphContainer1 class="graph-big" style="position:absolute; pointer-events: none; z-index: 1;">
+    <g [attr.transform]="marginTransform()">
+      <g #yAxis1 [attr.transform]="yAxis1TransformString()"></g>
     </g>
-    <g #yAxis1 [attr.transform]="yAxis1TransformString()"></g>
-    @for (path of viewPort.paths(); track $index) {  <!--Copy of dataservice svg-->
-      <path [attr.d]="path.d" fill="none" [attr.stroke]="path.color" stroke-width="2" />
-    }
-  </g>
-</svg>
+  </svg>
+  <div #graphContainer1_1 style="overflow-x: scroll;height: 100%;">
+    <svg style="height: 100%; width: unset; min-width: unset;" [attr.width]="widthBig()" >
+      <g [attr.transform]="marginTransform()">
+        <g #xAxis1 [attr.transform]="xAxis1TransformString()"></g>
+        @for (path of viewPort.paths(); track $index) {  <!--Copy of dataservice svg-->
+          <path [attr.d]="path.d" fill="none" [attr.stroke]="path.color" stroke-width="2" />
+        }
+      </g>
+    </svg>
+  </div>
+</div>
 <svg #graphContainer class="graph-small" appResizeObserver (resize)="updateGraphDimensions($event)">
     <g [attr.transform]="marginTransform()">
 
@@ -26,6 +31,11 @@
 <div id="selection">
     <app-start-data-button />
     <button mat-button color="primary" (click)="clearData() ">Clear Data</button>
+    @if (this.scrollFollow()) {
+      <button mat-button color="primary" (click)="toggleFollowData()">Unfollow Data</button>
+    } @else {
+      <button mat-button color="primary" (click)="toggleFollowData()">Follow Data</button>
+    }
     @if (this.stopped) {
     <button class="pause-play" mat-icon-button color="primary" (click)="toggleData()">
         <mat-icon style="color: green;">play_arrow</mat-icon>

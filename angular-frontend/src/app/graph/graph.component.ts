@@ -43,6 +43,9 @@ export class GraphComponent {
 
   readonly viewPort = new DataSourceService();
   readonly svgGraph1 = viewChild.required<ElementRef<SVGElement>>('graphContainer1');
+  readonly svgGraph1_data = viewChild.required<ElementRef<SVGElement>>('graphContainer1_1');
+  readonly scrollFollow = signal(false);
+  private oldWidth = 0;
   readonly axesContainer1 = viewChild.required<ElementRef<SVGGElement>>('xAxis1');
   readonly axesYContainer1 = viewChild.required<ElementRef<SVGGElement>>('yAxis1');
 
@@ -94,6 +97,7 @@ export class GraphComponent {
     const xScale = this.viewPort.xScale();
     return `translate(${xScale.range()[0]}, 0)`;
   });
+  widthBig = this.viewPort.width;
 
   /**
    * Signal to control the x-axis time mode. Relative starts with 0, absolute reflects the time of day the data was recorded.
@@ -124,7 +128,7 @@ export class GraphComponent {
 
   updateXAxis1InCanvas = effect(() => {
     if (!this.isInBrowser) return;
-    const x = this.dataservice.xScale();
+    const x = this.viewPort.xScale();
     const domain = x.domain();
     const formatter = makeXAxisTickFormatter(this.xAxisTimeMode(), domain[0]);
     const g = this.axesContainer1().nativeElement;
@@ -132,6 +136,14 @@ export class GraphComponent {
       .transition(transition())
       .duration(300)
       .call(axisBottom(x).tickFormat(formatter));
+    if (this.scrollFollow()){
+      let newWidth = this.widthBig();
+      if (this.oldWidth <= 0){
+        this.oldWidth = newWidth;
+        this.svgGraph1_data().nativeElement.scrollLeft = newWidth;
+      }
+      this.svgGraph1_data().nativeElement.scrollLeft += Math.abs(newWidth - this.oldWidth);
+    }
   });
 
   updateYAxis1InCanvas = effect(() => {
@@ -146,6 +158,12 @@ export class GraphComponent {
     }
   }
   public stopped = false;
+  toggleFollowData() {
+    this.scrollFollow.update(value => {
+      if(!value) this.oldWidth = this.widthBig();
+      return !value;
+    })
+  }
   toggleData() {
     if (this.stopped) {
       for (let test of this.dataSourceSelection.currentSource()) {
