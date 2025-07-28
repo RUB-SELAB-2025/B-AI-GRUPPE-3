@@ -69,7 +69,7 @@ export class DataSourceService {
    * Continually Calculates minima and maxima across all Signals for the X and Y axis, whilst respecting {@link DataSourceService.range}
    */
   readonly info = computed(() => {
-    const data = this.dataSourceSelectionService.data();
+    const data = this.data();
 
     //Get Raw DataInfo
     const info = new DataInfo();
@@ -77,16 +77,6 @@ export class DataSourceService {
     for (const points of Object.values(data)) {
       info.applyDataPoints(points);
     }
-
-    //Apply range info onto that Data Info
-    const range = this.range();
-    if (range.type == 'fixed') {
-      // info.minTimestamp = info.maxTimestamp - range.width;
-    } else if (range.type == 'adjustable') {
-      if (range.end) info.maxTimestamp = range.end;
-      if (range.start) info.minTimestamp = range.start;
-    }
-
     return info;
   })
   /**
@@ -105,43 +95,41 @@ export class DataSourceService {
         (range.end === undefined || range.end === Number.POSITIVE_INFINITY)
       ) {
         newData = data;
+        console.log(range, newData)
       }
       //Otherwise filter according to the given description
       else {
         for (const [key, value] of Object.entries(data)) {
-           newData[key] = value.filter(v=>
-             v.timestamp <= (range.end ?? Number.POSITIVE_INFINITY) &&
-               v.timestamp >= (range.start ?? Number.NEGATIVE_INFINITY)
-           )
-         // newData[key] = value
-       }
+          newData[key] = value.filter(v=>
+            v.timestamp <= (range.end ?? Number.POSITIVE_INFINITY) &&
+              v.timestamp >= (range.start ?? Number.NEGATIVE_INFINITY)
+          )
+          // newData[key] = value
+        }
+        console.log(range, newData)
       }
     } else if (range.type === 'fixed') {
-      const info = this.info();
+      //This isn't filtered here, since we want scrolling.
+      //Scrolling is currently just handled by rendering everything in a super-wide svg, which is scrolled by the browser.
       //info will already have applied the range info. minTimestamp will therefore be the correct value.
       for (const [key, value] of Object.entries(data)) {
-        // newData[key] = value.filter(v=> v.timestamp > info.minTimestamp)
         newData[key] = value
       }
+      console.log(newData)
     }
 
     return newData;
   })
 
-  xScale = linkedSignal({
-    source: () => ({
-      dimensions: this.$graphDimensions(),
-      xDomain: this.$xDomain(),
-    }),
-    computation: ({dimensions, xDomain}) => {
+  xScale = computed(()=>{
+      const xDomain = this.$xDomain();
       const margin = {top: 20, right: 30, bottom: 40, left: 40};
-      const margin_width = dimensions.width - margin.left - margin.right;
+      const margin_width = - margin.left - margin.right;
       const width = this.width();
       return d3ScaleUtc()
         .domain(xDomain)
         .range([0, width+margin_width]);
-    },
-  });
+  })
 
   public width = computed(()=>{
     let dimension = this.$graphDimensions();
@@ -154,20 +142,15 @@ export class DataSourceService {
     }
   })
 
-  yScale = linkedSignal({
-    source: () => ({
-      dimensions: this.$graphDimensions(),
-      yDomain: this.$yDomain(),
-    }),
-    computation: ({dimensions, yDomain}) => {
+  yScale = computed(()=>{
+      const dimensions = this.$graphDimensions();
+      const yDomain = this.$yDomain();
       const margin = {top: 20, right: 30, bottom: 40, left: 40};
       const height = dimensions.height - margin.top - margin.bottom;
       return d3ScaleLinear()
         .domain(yDomain)
         .range([height, 0]);
-
-    },
-  });
+  })
   readonly dataArray = computed(()=>{
     let data = this.data();
     let dataMap = [];
@@ -204,7 +187,6 @@ export class DataSourceService {
   })
 
   private scaleAxisToData(data: UnwrapSignal<typeof this.data>) {
-    console.log(data)
     if (Object.keys(data).length === 0) return;
 
     const expandBy = 0.1;
