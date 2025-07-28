@@ -1,3 +1,14 @@
+/*
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 import { isPlatformBrowser } from '@angular/common';
 import {
     Directive,
@@ -22,7 +33,7 @@ export class ResizeObserverDirective implements AfterViewInit {
     private readonly platform = inject(PLATFORM_ID);
 
     isInBrowser = isPlatformBrowser(this.platform);
-    
+
     ngAfterViewInit(): void {
         if (!this.isInBrowser) return;
         const observer = this.createResizeObserver();
