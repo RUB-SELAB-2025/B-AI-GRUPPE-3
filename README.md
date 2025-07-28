@@ -1,3 +1,23 @@
+# How to use this Project:
+
+Assuming you have an Omnai-Scope, you only need to:
+- [Head to the latest release](https://github.com/RUB-SELAB-2025/B-AI-GRUPPE-3/releases/latest)
+- Download the file ending with "Setup.exe"
+- Connect your Omnai-Scope to your pc
+- Execute the file
+- Click on "Select Data"
+- Click on "Select" in the "OmnAIScope" box in the popup
+- Click on "Start" in the popup on the bottom-right
+- You are now measuring data
+
+To stop a measurement, click on the Pause symbol below the graphs.
+When paused, the Pause button will turn into a Play button, to resume Measurement.
+
+To clear all data, click on Clear data
+
+To stop the top graph, from automatically scrolling to the latest data, Hit "Unfollow Data".
+After being pressed, it will turn into a "Follow Data" button, where you can undo this change.
+
 # OmnAIView
 
 Welcome to OmnAIView! Let's get started!
