@@ -16,6 +16,12 @@ svg {
     display: block;
     box-sizing: border-box;
 }
+
+
+line {
+  stroke: black;
+}
+
 @media (prefers-color-scheme: dark) {
   text {
     fill: white;
