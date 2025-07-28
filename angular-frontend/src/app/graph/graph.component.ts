@@ -127,8 +127,28 @@ export class GraphComponent {
       this.viewPort.range.update(old=> {
         let newValue: WindowDataAdjust = {type: "adjustable"};
         if (old.type == "adjustable") newValue = old;
-        if (primary) newValue.start = hovered_datapoint.datapoint.value.timestamp;
-        if (secondary) newValue.end = hovered_datapoint.datapoint.value.timestamp;
+        if (primary)
+          if(event.ctrlKey) {
+            if (typeof newValue.start !== "undefined" && newValue.end == newValue.start + 25_000) delete newValue.end;
+            delete newValue.start;
+          }
+          else {
+            newValue.start = hovered_datapoint.datapoint.value.timestamp;
+            if (typeof newValue.end === "undefined") newValue.end = newValue.start + 25_000;
+          }
+
+        if (secondary)
+          if(event.ctrlKey){
+            if (typeof newValue.end !== "undefined" && newValue.start == newValue.end + 25_000) delete newValue.start;
+            delete newValue.end;
+          } else {
+            newValue.end = hovered_datapoint.datapoint.value.timestamp;
+            if (typeof newValue.start === "undefined") newValue.start = newValue.end - 25_000;
+          }
+
+        if (typeof newValue.start === "undefined" && typeof newValue.end === "undefined") {
+          return {type: "fixed", width: 25_000};
+        }
         return newValue;
       })
       if (primary||secondary) {
