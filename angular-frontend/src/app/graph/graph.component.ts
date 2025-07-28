@@ -324,6 +324,7 @@ export class GraphComponent {
     for (let test of this.dataSourceSelection.availableSources()) {
       test.clearData();
     }
+    this.viewPort.range.set({type: "fixed", width: 25_000});
   }
   public stopped = false;
   toggleFollowData() {
