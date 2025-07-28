@@ -56,7 +56,7 @@ export class GraphComponent {
   readonly svgGraph1 = viewChild.required<ElementRef<SVGElement>>('graphContainer1');
   readonly svgGraph1_scroll = viewChild.required<ElementRef<SVGElement>>('graphContainer1_1');
   readonly svgGraph1_data = viewChild.required<ElementRef<SVGElement>>('graphContainer1_1data');
-  readonly scrollFollow = signal(false);
+  readonly scrollFollow = signal(true);
   readonly axesContainer1 = viewChild.required<ElementRef<SVGGElement>>('xAxis1');
   readonly axesYContainer1 = viewChild.required<ElementRef<SVGGElement>>('yAxis1');
 
