@@ -1,5 +1,6 @@
 .graph-big {
   height: 55%;
+  border: 1px solid #ccc;
 }
 
 .graph-small {
@@ -16,7 +17,9 @@ svg {
     display: block;
     box-sizing: border-box;
 }
-
+.graph-big svg {
+  border: unset;
+}
 
 line {
   stroke: black;
