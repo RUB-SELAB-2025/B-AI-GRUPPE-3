@@ -7,8 +7,6 @@ import { type GraphComponent } from './graph.component';
 import {DataInfo, DataSourceSelectionService} from '../source-selection/data-source-selection.service';
 import { color } from 'd3';
 import {Delaunay} from 'd3-delaunay';
-import * as domain from 'node:domain';
-import {sign} from 'node:crypto';
 
 
 type UnwrapSignal<T> = T extends import('@angular/core').Signal<infer U> ? U : never;
