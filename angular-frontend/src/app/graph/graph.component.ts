@@ -212,16 +212,14 @@ export class GraphComponent {
   });
 
   marker_ymin = computed(() => {
-    const info = this.viewPort.info();
+    const info = this.dataservice.info();
     const yScale = this.dataservice.yScale();
-    const minY = yScale(info.minValue);
-    return minY;
+    return yScale(info.minValue);
   })
   marker_ymax = computed(() => {
-    const info = this.viewPort.info();
+    const info = this.dataservice.info();
     const yScale = this.dataservice.yScale();
-    const maxY = yScale(info.maxValue);
-    return maxY;
+    return yScale(info.maxValue);
   })
   marker_xleft = computed(() => {
     const range = this.viewPort.range();
