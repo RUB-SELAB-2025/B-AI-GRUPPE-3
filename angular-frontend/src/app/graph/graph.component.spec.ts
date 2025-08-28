@@ -13,7 +13,8 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GraphComponent } from './graph.component';
-import { StartDataButtonComponent } from '../source-selection/start-data-from-source.component';
+import {BackendPortService} from '../omnai-datasource/omnai-scope-server/backend-port.service';
+import {signal} from '@angular/core';
 
 import {HarnessLoader} from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
@@ -21,15 +22,24 @@ import {MatButtonHarness} from '@angular/material/button/testing';
 import {MatCardHarness} from '@angular/material/card/testing';
 import {MatTestDialogOpenerModule,MatDialogHarness} from '@angular/material/dialog/testing';
 
+class MockBackendPortService{
+  port = signal(8000);
+  async init():Promise<void>{}
+}
+
 describe('GraphComponent', () => {
   let component: GraphComponent;
   let fixture: ComponentFixture<GraphComponent>;
   let loader: HarnessLoader;
+  let mockBackendPortService: MockBackendPortService;
 
   beforeEach(async () => {
+    mockBackendPortService = new MockBackendPortService();
     await TestBed.configureTestingModule({
       imports: [GraphComponent],
-      providers: [provideHttpClient(), provideHttpClientTesting()]
+      providers: [provideHttpClient(),
+            provideHttpClientTesting(),
+            {provide: BackendPortService, useValue: mockBackendPortService},]
     })
       .compileComponents();
 
