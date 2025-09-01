@@ -14,7 +14,8 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GraphComponent } from './graph.component';
 import {BackendPortService} from '../omnai-datasource/omnai-scope-server/backend-port.service';
-import {signal} from '@angular/core';
+import {OmnAIScopeDataService} from '../omnai-datasource/omnai-scope-server/live-data.service';
+import {WritableSignal, signal, Injectable, inject} from '@angular/core';
 
 import {HarnessLoader} from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
@@ -22,9 +23,12 @@ import {MatButtonHarness} from '@angular/material/button/testing';
 import {MatCardHarness} from '@angular/material/card/testing';
 import {MatTestDialogOpenerModule,MatDialogHarness} from '@angular/material/dialog/testing';
 
+@Injectable({
+    providedIn: 'root',
+  })
 class MockBackendPortService{
-  port = signal(8000);
-  async init():Promise<void>{}
+  port = signal<number | null>(null);
+  async init():Promise<void>{this.port.set(8000);}
 }
 
 describe('GraphComponent', () => {
@@ -32,14 +36,16 @@ describe('GraphComponent', () => {
   let fixture: ComponentFixture<GraphComponent>;
   let loader: HarnessLoader;
   let mockBackendPortService: MockBackendPortService;
+  let port: WritableSignal<number | null>
 
   beforeEach(async () => {
     mockBackendPortService = new MockBackendPortService();
+    port = inject(MockBackendPortService).port;
     await TestBed.configureTestingModule({
       imports: [GraphComponent],
       providers: [provideHttpClient(),
             provideHttpClientTesting(),
-            {provide: BackendPortService, useValue: mockBackendPortService},]
+            {provide: BackendPortService, useValue: port},]
     })
       .compileComponents();
 
